@@ -22,15 +22,25 @@ namespace PublicPCControl.Client.Services
 
         public AppConfig Load()
         {
-            if (!File.Exists(_configPath))
+            try
             {
-                var defaultConfig = new AppConfig();
-                Save(defaultConfig);
-                return defaultConfig;
-            }
+                if (!File.Exists(_configPath))
+                {
+                    var defaultConfig = new AppConfig();
+                    Save(defaultConfig);
+                    return defaultConfig;
+                }
 
-            var json = File.ReadAllText(_configPath);
-            return JsonSerializer.Deserialize<AppConfig>(json, _options) ?? new AppConfig();
+                var json = File.ReadAllText(_configPath);
+                return JsonSerializer.Deserialize<AppConfig>(json, _options) ?? new AppConfig();
+            }
+            catch (Exception ex) when (ex is JsonException or IOException or UnauthorizedAccessException)
+            {
+                BackupCorruptConfig();
+                var fallback = new AppConfig();
+                Save(fallback);
+                return fallback;
+            }
         }
 
         public void Save(AppConfig config)
@@ -45,6 +55,17 @@ namespace PublicPCControl.Client.Services
             var bytes = Encoding.UTF8.GetBytes(plain);
             var hash = sha.ComputeHash(bytes);
             return Convert.ToHexString(hash);
+        }
+
+        private void BackupCorruptConfig()
+        {
+            if (!File.Exists(_configPath))
+            {
+                return;
+            }
+
+            var backupPath = _configPath + ".corrupt.bak";
+            File.Copy(_configPath, backupPath, overwrite: true);
         }
     }
 }

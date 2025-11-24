@@ -7,19 +7,24 @@ namespace PublicPCControl.Client.Data
 {
     public static class DatabaseInitializer
     {
-        public static string GetConnectionString()
+        private static string GetDatabasePath()
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             var dbPath = Path.Combine(localAppData, "PublicPCControl", "Data", "publicpc.db");
             Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
             return new SqliteConnectionStringBuilder { DataSource = dbPath }.ToString();
+            return dbPath;
+        }
+
+        public static string GetConnectionString()
+        {
+            var dbPath = GetDatabasePath();
         }
 
         public static void EnsureDatabase()
         {
-            using var connection = new SqliteConnection(GetConnectionString());
-            connection.Open();
-
+            using var connection = OpenWithRecovery();
+            
             var commands = new[]
             {
                 @"CREATE TABLE IF NOT EXISTS sessions (
@@ -62,6 +67,30 @@ namespace PublicPCControl.Client.Data
                 using var cmd = connection.CreateCommand();
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
+            }
+        }
+
+        private static SqliteConnection OpenWithRecovery()
+        {
+            var dbPath = GetDatabasePath();
+            try
+            {
+                var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = dbPath }.ToString());
+                connection.Open();
+                return connection;
+            }
+            catch (SqliteException)
+            {
+                if (File.Exists(dbPath))
+                {
+                    var backupPath = dbPath + ".corrupt.bak";
+                    File.Copy(dbPath, backupPath, overwrite: true);
+                    File.Delete(dbPath);
+                }
+
+                var connection = new SqliteConnection(new SqliteConnectionStringBuilder { DataSource = dbPath }.ToString());
+                connection.Open();
+                return connection;
             }
         }
     }
