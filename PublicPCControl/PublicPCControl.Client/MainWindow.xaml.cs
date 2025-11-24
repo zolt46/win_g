@@ -9,14 +9,6 @@ namespace PublicPCControl.Client
         public MainWindow()
         {
             InitializeComponent();
-            try
-            {
-                DataContext = new MainViewModel();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"초기화 중 오류가 발생했습니다: {ex.Message}", "PublicPCControl", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
         }
     }
 }

@@ -5,7 +5,7 @@
              xmlns:views="clr-namespace:PublicPCControl.Client.Views"
              xmlns:viewModels="clr-namespace:PublicPCControl.Client.ViewModels"
              xmlns:conv="clr-namespace:PublicPCControl.Client.Resources"
-             StartupUri="MainWindow.xaml">
+             Startup="OnStartup">
     <Application.Resources>
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
         <DataTemplate DataType="{x:Type viewModels:LockScreenViewModel}">
