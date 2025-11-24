@@ -1,0 +1,20 @@
+{
+  "EnforcementEnabled": true,
+  "IsAdminOnlyPc": false,
+  "DefaultSessionMinutes": 60,
+  "MaxSessionMinutes": 120,
+  "KillDisallowedProcess": true,
+  "AllowedPrograms": [
+    {
+      "DisplayName": "웹 브라우저",
+      "ExecutablePath": "C:/Program Files/Google/Chrome/Application/chrome.exe",
+      "Arguments": ""
+    },
+    {
+      "DisplayName": "워드패드",
+      "ExecutablePath": "C:/Program Files/Windows NT/Accessories/wordpad.exe",
+      "Arguments": ""
+    }
+  ],
+  "AdminPasswordHash": ""
+}

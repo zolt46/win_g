@@ -1,0 +1,31 @@
+// File: PublicPCControl.Client/Views/LockScreenView.xaml
+<UserControl x:Class="PublicPCControl.Client.Views.LockScreenView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="clr-namespace:PublicPCControl.Client.Resources"
+             mc:Ignorable="d" Background="#222">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:InverseBooleanConverter x:Key="InverseBool" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
+            <TextBlock Text="자료열람실 공용 PC" Foreground="White" FontSize="32" HorizontalAlignment="Center"/>
+            <TextBlock Text="{Binding Notice}" Foreground="LightGray" TextWrapping="Wrap" Width="420" TextAlignment="Center"/>
+            <Button Content="사용 시작" Padding="20,10" FontSize="20" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" />
+            <TextBlock Text="{Binding AdminNotice}" Foreground="Orange" TextWrapping="Wrap" Width="420" TextAlignment="Center" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}, ConverterParameter=Visibility}" />
+        </StackPanel>
+        <Border Grid.Row="1" Background="#333" Padding="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                <TextBlock Text="관리자: Ctrl+Alt+F12" Foreground="Gray" />
+                <Button Content="관리자 화면" Command="{Binding AdminCommand}"/>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
