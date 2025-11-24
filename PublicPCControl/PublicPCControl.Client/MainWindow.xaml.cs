@@ -9,6 +9,7 @@ namespace PublicPCControl.Client
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = new MainViewModel();
         }
     }
 }
