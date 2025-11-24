@@ -66,6 +66,7 @@ namespace PublicPCControl.Client.ViewModels
         {
             SessionViewModel.StopTimer();
             CurrentViewModel = LockScreenViewModel;
+            LockScreenViewModel.Refresh();
         }
 
         private void ShowAdminView()
@@ -107,6 +108,7 @@ namespace PublicPCControl.Client.ViewModels
         {
             Config = config;
             _configService.Save(config);
+            LockScreenViewModel.Refresh();
         }
     }
 }

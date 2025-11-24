@@ -25,13 +25,25 @@ namespace PublicPCControl.Client.ViewModels
         public string UserName
         {
             get => _userName;
-            set => SetProperty(ref _userName, value);
+            set
+            {
+                if (SetProperty(ref _userName, value))
+                {
+                    RaiseCanStartChanged();
+                }
+            }
         }
 
         public string UserId
         {
             get => _userId;
-            set => SetProperty(ref _userId, value);
+            set
+            {
+                if (SetProperty(ref _userId, value))
+                {
+                    RaiseCanStartChanged();
+                }
+            }
         }
 
         public string Purpose
@@ -43,13 +55,25 @@ namespace PublicPCControl.Client.ViewModels
         public int RequestedMinutes
         {
             get => _requestedMinutes;
-            set => SetProperty(ref _requestedMinutes, value);
+            set
+            {
+                if (SetProperty(ref _requestedMinutes, value))
+                {
+                    RaiseCanStartChanged();
+                }
+            }
         }
 
         public bool Consent
         {
             get => _consent;
-            set => SetProperty(ref _consent, value);
+            set
+            {
+                if (SetProperty(ref _consent, value))
+                {
+                    RaiseCanStartChanged();
+                }
+            }
         }
 
         public ICommand StartCommand { get; }
@@ -75,6 +99,14 @@ namespace PublicPCControl.Client.ViewModels
             UserName = string.Empty;
             UserId = string.Empty;
             RequestedMinutes = _getConfig().DefaultSessionMinutes;
+        }
+
+        private void RaiseCanStartChanged()
+        {
+            if (StartCommand is RelayCommand relay)
+            {
+                relay.RaiseCanExecuteChanged();
+            }
         }
     }
 }

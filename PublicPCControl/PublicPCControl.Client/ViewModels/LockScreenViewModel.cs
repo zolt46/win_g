@@ -27,5 +27,14 @@ namespace PublicPCControl.Client.ViewModels
         }
 
         public bool IsUserAllowed => !_getConfig().IsAdminOnlyPc && _getConfig().EnforcementEnabled;
+
+        public void Refresh()
+        {
+            OnPropertyChanged(nameof(IsUserAllowed));
+            if (StartCommand is RelayCommand relay)
+            {
+                relay.RaiseCanExecuteChanged();
+            }
+        }
     }
 }

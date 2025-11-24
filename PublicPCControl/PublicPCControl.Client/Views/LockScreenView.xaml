@@ -5,26 +5,43 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:PublicPCControl.Client.Resources"
-             mc:Ignorable="d" Background="#222">
+             xmlns:sys="clr-namespace:System;assembly=mscorlib"
+             mc:Ignorable="d" Background="#222" Focusable="True" Loaded="OnLoaded">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <conv:InverseBooleanConverter x:Key="InverseBool" />
     </UserControl.Resources>
+    <UserControl.InputBindings>
+        <KeyBinding Key="F12" Modifiers="Control,Alt" Command="{Binding AdminCommand}" />
+    </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="자료열람실 공용 PC" Foreground="White" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,12"/>
-            <TextBlock Text="{Binding Notice}" Foreground="LightGray" TextWrapping="Wrap" Width="420" TextAlignment="Center" Margin="0,0,0,12"/>
-            <Button Content="사용 시작" Padding="20,10" FontSize="20" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Margin="0,0,0,12" />
-            <TextBlock Text="{Binding AdminNotice}" Foreground="Orange" TextWrapping="Wrap" Width="420" TextAlignment="Center" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}, ConverterParameter=Visibility}" />
-        </StackPanel>
-        <Border Grid.Row="1" Background="#333" Padding="10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="관리자: Ctrl+Alt+F12" Foreground="Gray" Margin="0,0,10,0" />
-                <Button Content="관리자 화면" Command="{Binding AdminCommand}"/>
+        <Border Width="520" Padding="32" Background="#1b1b1b" CornerRadius="12" BorderBrush="#2f2f2f" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <StackPanel>
+                <TextBlock Text="자료열람실 공용 PC" Foreground="White" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,12" FontWeight="Bold" />
+                <TextBlock Text="{Binding Notice}" Foreground="#d0d0d0" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,16"/>
+                <Separator Margin="0,0,0,12" Background="#333" Height="1" />
+                <Button Content="사용 시작" Padding="20,12" FontSize="22" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Margin="0,0,0,16" Background="#4caf50" Foreground="White" BorderBrush="#61c26a" />
+                <TextBlock Text="{Binding AdminNotice}" Foreground="#f0b24d" TextWrapping="Wrap" TextAlignment="Center" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}, ConverterParameter=Visibility}" />
+                <StackPanel Margin="0,24,0,0" Background="#121212" Padding="12" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                    <StackPanel>
+                        <TextBlock Text="운영 모드" Foreground="#8f8f8f" FontSize="12" />
+                        <TextBlock Text="관리자 단축키: Ctrl + Alt + F12" Foreground="#c0c0c0" />
+                    </StackPanel>
+                    <Border Width="14" Height="14" CornerRadius="7" Background="#4caf50" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}"/>
+                    <TextBlock Text="사용 가능" Foreground="LightGray" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" />
+                    <Border Width="14" Height="14" CornerRadius="7" Background="#f0b24d" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}}"/>
+                    <TextBlock Text="관리자 전용" Foreground="#f0b24d" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+        <Border Grid.Row="1" Background="#111" Padding="10">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="12">
+                <TextBlock Text="현재 시간" Foreground="#888" VerticalAlignment="Center" />
+                <TextBlock Foreground="White" VerticalAlignment="Center" Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat=HH:mm}" />
             </StackPanel>
         </Border>
     </Grid>

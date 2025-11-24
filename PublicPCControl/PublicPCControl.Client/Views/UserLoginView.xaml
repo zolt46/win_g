@@ -4,44 +4,47 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" Background="#1d1d1d">
+             mc:Ignorable="d" Background="#141414">
     <Grid Margin="60">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <StackPanel Orientation="Vertical">
-            <TextBlock Text="사용자 정보 입력" Foreground="White" FontSize="24" Margin="0,0,0,8" />
-            <TextBlock Text="이 PC 사용 기록 및 활동 정보가 저장됩니다." Foreground="LightGray" />
+            <TextBlock Text="사용자 정보 입력" Foreground="White" FontSize="26" Margin="0,0,0,8" FontWeight="Bold" />
+            <TextBlock Text="이 PC 사용 기록 및 활동 정보가 저장됩니다." Foreground="#d0d0d0" />
         </StackPanel>
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <StackPanel.Resources>
-                    <Style TargetType="Control">
-                        <Setter Property="Margin" Value="0,0,0,8" />
-                    </Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Margin" Value="0,0,0,4" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Text="이름" Foreground="White" />
-                <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Text="ID" Foreground="White" />
-                <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" />
-                <TextBlock Text="이용 목적" Foreground="White" />
-                <ComboBox ItemsSource="{Binding PurposeOptions}" SelectedItem="{Binding Purpose}" />
-                <TextBlock Text="희망 이용 시간(분)" Foreground="White" />
-                <TextBox Text="{Binding RequestedMinutes}" />
-                <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="White" Margin="0" />
-            </StackPanel>
-            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                <Button Content="사용 시작" Padding="20,10" FontSize="20" Command="{Binding StartCommand}" Margin="0,0,0,12" />
-                <Button Content="취소" Command="{Binding CancelCommand}" />
-            </StackPanel>
-        </Grid>
+        <Border Grid.Row="1" Background="#1f1f1f" Padding="20" CornerRadius="10" BorderBrush="#2d2d2d" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="2.5*"/>
+                    <ColumnDefinition Width="2*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <StackPanel.Resources>
+                        <Style TargetType="Control">
+                            <Setter Property="Margin" Value="0,0,0,10" />
+                            <Setter Property="Padding" Value="10,6" />
+                        </Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Margin" Value="0,0,0,4" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="이름" Foreground="#e6e6e6" />
+                    <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" Background="#2a2a2a" Foreground="White" BorderBrush="#3b82f6" />
+                    <TextBlock Text="ID" Foreground="#e6e6e6" />
+                    <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" Background="#2a2a2a" Foreground="White" BorderBrush="#3b82f6" />
+                    <TextBlock Text="이용 목적" Foreground="#e6e6e6" />
+                    <ComboBox ItemsSource="{Binding PurposeOptions}" SelectedItem="{Binding Purpose}" Background="#2a2a2a" Foreground="White" BorderBrush="#3b82f6" />
+                    <TextBlock Text="희망 이용 시간(분)" Foreground="#e6e6e6" />
+                    <TextBox Text="{Binding RequestedMinutes, UpdateSourceTrigger=PropertyChanged}" Background="#2a2a2a" Foreground="White" BorderBrush="#3b82f6" />
+                    <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="White" Margin="0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="12">
+                    <Button Content="사용 시작" Padding="20,12" FontSize="20" Command="{Binding StartCommand}" Background="#4caf50" Foreground="White" BorderBrush="#61c26a" />
+                    <Button Content="취소" Command="{Binding CancelCommand}" Background="#2e2e2e" Foreground="White" />
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>
