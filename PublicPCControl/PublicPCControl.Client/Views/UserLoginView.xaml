@@ -1,4 +1,4 @@
-// File: PublicPCControl.Client/Views/UserLoginView.xaml
+<!-- File: PublicPCControl.Client/Views/UserLoginView.xaml -->
 <UserControl x:Class="PublicPCControl.Client.Views.UserLoginView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

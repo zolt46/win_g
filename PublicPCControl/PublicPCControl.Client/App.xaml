@@ -1,4 +1,4 @@
-// File: PublicPCControl.Client/App.xaml
+<!-- File: PublicPCControl.Client/App.xaml -->
 <Application x:Class="PublicPCControl.Client.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"

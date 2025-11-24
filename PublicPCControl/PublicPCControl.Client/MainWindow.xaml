@@ -1,4 +1,4 @@
-// File: PublicPCControl.Client/MainWindow.xaml
+<!-- File: PublicPCControl.Client/MainWindow.xaml -->
 <Window x:Class="PublicPCControl.Client.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
