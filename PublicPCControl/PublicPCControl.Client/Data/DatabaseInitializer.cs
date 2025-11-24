@@ -10,6 +10,16 @@ namespace PublicPCControl.Client.Data
         private static string GetDatabasePath()
         {
             var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            if (string.IsNullOrWhiteSpace(localAppData))
+            {
+                // Fallback for environments where LocalApplicationData is unavailable
+                var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                var fallbackPath = Path.Combine(baseDir, "Data", "publicpc.db");
+                Directory.CreateDirectory(Path.GetDirectoryName(fallbackPath)!);
+                return fallbackPath;
+            }
+
             var dbPath = Path.Combine(localAppData, "PublicPCControl", "Data", "publicpc.db");
             Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
             return new SqliteConnectionStringBuilder { DataSource = dbPath }.ToString();
