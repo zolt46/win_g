@@ -29,28 +29,34 @@ namespace PublicPCControl.Client.Services
 
         private void TimerElapsed(object? sender, ElapsedEventArgs e)
         {
-            var config = _getConfig();
-            var session = _getSession();
-            if (session == null || !config.KillDisallowedProcess) return;
-
-            var allowedPaths = new HashSet<string>(config.AllowedPrograms.Select(a => a.ExecutablePath), StringComparer.OrdinalIgnoreCase);
-            var processes = Process.GetProcesses();
-            foreach (var p in processes)
+            try
             {
-                try
+                var config = _getConfig();
+                var session = _getSession();
+                if (session == null || !config.KillDisallowedProcess) return;
+                var allowedPaths = new HashSet<string>(config.AllowedPrograms.Select(a => a.ExecutablePath), StringComparer.OrdinalIgnoreCase);
+                var processes = Process.GetProcesses();
+                foreach (var p in processes)
                 {
-                    var path = p.MainModule?.FileName ?? string.Empty;
-                    if (string.IsNullOrWhiteSpace(path)) continue;
-                    if (allowedPaths.Contains(path) || path.Contains("\\Windows\\"))
-                        continue;
+                    try
+                    {
+                        var path = p.MainModule?.FileName ?? string.Empty;
+                        if (string.IsNullOrWhiteSpace(path)) continue;
+                        if (allowedPaths.Contains(path) || path.Contains("\\Windows\\"))
+                            continue;
 
-                    _loggingService.LogProcessEnd(session.Id, p.ProcessName, path, "blocked");
-                    p.Kill();
+                        _loggingService.LogProcessEnd(session.Id, p.ProcessName, path, "blocked");
+                        p.Kill();
+                    }
+                    catch (Exception)
+                    {
+                        // ignore access denied
+                    }
                 }
-                catch (Exception)
-                {
-                    // ignore access denied
-                }
+            }
+            catch (Exception)
+            {
+                // last line of defense to prevent timer thread crash
             }
         }
 

@@ -25,16 +25,44 @@ namespace PublicPCControl.Client.Services
 
         private void TimerElapsed(object? sender, ElapsedEventArgs e)
         {
-            var handle = GetForegroundWindow();
-            var sb = new StringBuilder(256);
-            GetWindowText(handle, sb, sb.Capacity);
-            var title = sb.ToString();
-            GetWindowThreadProcessId(handle, out var pid);
-            var process = Process.GetProcessById((int)pid);
-            if (!string.Equals(_lastTitle, title, StringComparison.Ordinal))
+            try
             {
-                _lastTitle = title;
-                _onWindowChanged(process.ProcessName, title);
+                var handle = GetForegroundWindow();
+                if (handle == IntPtr.Zero)
+                {
+                    return;
+                }
+
+                GetWindowThreadProcessId(handle, out var pid);
+                if (pid == 0)
+                {
+                    return;
+                }
+
+                Process? process = null;
+                try
+                {
+                    process = Process.GetProcessById((int)pid);
+                }
+                catch (Exception)
+                {
+                    // window may have closed; ignore this tick
+                    return;
+                }
+
+                var sb = new StringBuilder(256);
+                GetWindowText(handle, sb, sb.Capacity);
+                var title = sb.ToString();
+
+                if (!string.Equals(_lastTitle, title, StringComparison.Ordinal))
+                {
+                    _lastTitle = title;
+                    _onWindowChanged(process.ProcessName, title);
+                }
+            }
+            catch (Exception)
+            {
+                // swallow any timer exceptions to avoid crashing the UI thread
             }
         }
 
