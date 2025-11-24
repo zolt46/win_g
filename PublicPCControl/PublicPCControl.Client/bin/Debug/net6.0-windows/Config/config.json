@@ -1,0 +1,9 @@
+{
+  "EnforcementEnabled": true,
+  "IsAdminOnlyPc": false,
+  "DefaultSessionMinutes": 60,
+  "MaxSessionMinutes": 120,
+  "KillDisallowedProcess": true,
+  "AllowedPrograms": [],
+  "AdminPasswordHash": ""
+}
