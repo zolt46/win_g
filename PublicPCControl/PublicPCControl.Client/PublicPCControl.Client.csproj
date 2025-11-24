@@ -7,7 +7,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>x86;x64</Platforms>
     <ApplicationIcon />
+    <EnableDefaultPageItems>false</EnableDefaultPageItems>
   </PropertyGroup>
+
+    <ItemGroup>
+    <ApplicationDefinition Include="App.xaml" />
+    <Page Include="MainWindow.xaml" />
+    <Page Include="Views\AdminView.xaml" />
+    <Page Include="Views\LockScreenView.xaml" />
+    <Page Include="Views\SessionView.xaml" />
+    <Page Include="Views\UserLoginView.xaml" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="7.0.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
