@@ -8,6 +8,7 @@
     <Platforms>x86;x64</Platforms>
     <ApplicationIcon />
     <EnableDefaultPageItems>false</EnableDefaultPageItems>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
   </PropertyGroup>
 
     <ItemGroup>
