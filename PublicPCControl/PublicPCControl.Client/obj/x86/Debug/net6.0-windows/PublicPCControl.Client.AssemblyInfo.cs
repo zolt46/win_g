@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PublicPCControl.Client")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+a4107e9d90ca24c195cd06e00554aec6422dd1f8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+86599c1e7d374e24f950d2cfa51cdea676b512f5")]
 [assembly: System.Reflection.AssemblyProductAttribute("PublicPCControl.Client")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PublicPCControl.Client")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
