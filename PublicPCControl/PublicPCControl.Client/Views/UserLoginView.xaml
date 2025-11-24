@@ -40,9 +40,9 @@
                     <TextBox Text="{Binding RequestedMinutes, UpdateSourceTrigger=PropertyChanged}" Background="#2a2a2a" Foreground="White" BorderBrush="#3b82f6" />
                     <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="White" Margin="0" />
                 </StackPanel>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="12">
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
                     <Button Content="사용 시작" Padding="20,12" FontSize="20" Command="{Binding StartCommand}" Background="#4caf50" Foreground="White" BorderBrush="#61c26a" />
-                    <Button Content="취소" Command="{Binding CancelCommand}" Background="#2e2e2e" Foreground="White" />
+                    <Button Content="취소" Command="{Binding CancelCommand}" Background="#2e2e2e" Foreground="White" Margin="0,12,0,0" />
                 </StackPanel>
             </Grid>
         </Border>
