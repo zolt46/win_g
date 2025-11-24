@@ -1,2 +1,7 @@
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\PublicPCControl.Client.csproj.AssemblyReference.cache
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\PublicPCControl.Client_MarkupCompile.cache
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\MainWindow.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\MainWindow.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\App.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\GeneratedInternalTypeHelper.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\PublicPCControl.Client_MarkupCompile.lref

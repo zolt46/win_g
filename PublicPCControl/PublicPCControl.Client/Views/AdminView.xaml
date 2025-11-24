@@ -17,7 +17,15 @@
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Spacing="10">
+            <StackPanel Grid.Column="0">
+                <StackPanel.Resources>
+                    <Style TargetType="Control">
+                        <Setter Property="Margin" Value="0,0,0,8" />
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="0,0,0,4" />
+                    </Style>
+                </StackPanel.Resources>
                 <CheckBox Content="공용 PC 관리 기능 ON" IsChecked="{Binding EnforcementEnabled}" Foreground="White" />
                 <CheckBox Content="관리자 전용 PC" IsChecked="{Binding IsAdminOnlyPc}" Foreground="White" />
                 <CheckBox Content="허용되지 않은 프로그램 자동 종료" IsChecked="{Binding KillDisallowedProcess}" Foreground="White" />
@@ -26,7 +34,15 @@
                 <TextBlock Text="최대 이용 시간(분)" Foreground="White" />
                 <TextBox Text="{Binding MaxSessionMinutes}" />
             </StackPanel>
-            <StackPanel Grid.Column="1" Spacing="8">
+            <StackPanel Grid.Column="1">
+                <StackPanel.Resources>
+                    <Style TargetType="Control">
+                        <Setter Property="Margin" Value="0,0,0,8" />
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="0,0,0,4" />
+                    </Style>
+                </StackPanel.Resources>
                 <TextBlock Text="허용 프로그램" Foreground="White" FontWeight="Bold" />
                 <DataGrid ItemsSource="{Binding AllowedPrograms}" AutoGenerateColumns="False" Height="200">
                     <DataGrid.Columns>
@@ -34,15 +50,15 @@
                         <DataGridTextColumn Header="경로" Binding="{Binding ExecutablePath}" Width="2*" />
                     </DataGrid.Columns>
                 </DataGrid>
-                <StackPanel Orientation="Horizontal" Spacing="6">
-                    <TextBox Width="160" Text="{Binding NewProgramName}" />
-                    <TextBox Width="260" Text="{Binding NewProgramPath}" />
+                <StackPanel Orientation="Horizontal">
+                    <TextBox Width="160" Text="{Binding NewProgramName}" Margin="0,0,6,0" />
+                    <TextBox Width="260" Text="{Binding NewProgramPath}" Margin="0,0,6,0" />
                     <Button Content="추가" Command="{Binding AddProgramCommand}" />
                 </StackPanel>
             </StackPanel>
         </Grid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-            <Button Content="저장" Command="{Binding SaveCommand}" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="저장" Command="{Binding SaveCommand}" Margin="0,0,8,0" />
             <Button Content="닫기" Command="{Binding CloseCommand}" />
         </StackPanel>
     </Grid>

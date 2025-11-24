@@ -10,8 +10,8 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical" Spacing="8">
-            <TextBlock Text="사용자 정보 입력" Foreground="White" FontSize="24" />
+        <StackPanel Orientation="Vertical">
+            <TextBlock Text="사용자 정보 입력" Foreground="White" FontSize="24" Margin="0,0,0,8" />
             <TextBlock Text="이 PC 사용 기록 및 활동 정보가 저장됩니다." Foreground="LightGray" />
         </StackPanel>
         <Grid Grid.Row="1">
@@ -19,7 +19,15 @@
                 <ColumnDefinition Width="2*"/>
                 <ColumnDefinition Width="3*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0" Spacing="10">
+            <StackPanel Grid.Column="0">
+                <StackPanel.Resources>
+                    <Style TargetType="Control">
+                        <Setter Property="Margin" Value="0,0,0,8" />
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="0,0,0,4" />
+                    </Style>
+                </StackPanel.Resources>
                 <TextBlock Text="이름" Foreground="White" />
                 <TextBox Text="{Binding UserName, UpdateSourceTrigger=PropertyChanged}" />
                 <TextBlock Text="ID" Foreground="White" />
@@ -28,10 +36,10 @@
                 <ComboBox ItemsSource="{Binding PurposeOptions}" SelectedItem="{Binding Purpose}" />
                 <TextBlock Text="희망 이용 시간(분)" Foreground="White" />
                 <TextBox Text="{Binding RequestedMinutes}" />
-                <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="White" />
+                <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="White" Margin="0" />
             </StackPanel>
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="12">
-                <Button Content="사용 시작" Padding="20,10" FontSize="20" Command="{Binding StartCommand}" />
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <Button Content="사용 시작" Padding="20,10" FontSize="20" Command="{Binding StartCommand}" Margin="0,0,0,12" />
                 <Button Content="취소" Command="{Binding CancelCommand}" />
             </StackPanel>
         </Grid>

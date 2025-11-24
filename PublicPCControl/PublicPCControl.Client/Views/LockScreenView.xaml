@@ -15,15 +15,15 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="12">
-            <TextBlock Text="자료열람실 공용 PC" Foreground="White" FontSize="32" HorizontalAlignment="Center"/>
-            <TextBlock Text="{Binding Notice}" Foreground="LightGray" TextWrapping="Wrap" Width="420" TextAlignment="Center"/>
-            <Button Content="사용 시작" Padding="20,10" FontSize="20" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" />
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+            <TextBlock Text="자료열람실 공용 PC" Foreground="White" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,12"/>
+            <TextBlock Text="{Binding Notice}" Foreground="LightGray" TextWrapping="Wrap" Width="420" TextAlignment="Center" Margin="0,0,0,12"/>
+            <Button Content="사용 시작" Padding="20,10" FontSize="20" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Margin="0,0,0,12" />
             <TextBlock Text="{Binding AdminNotice}" Foreground="Orange" TextWrapping="Wrap" Width="420" TextAlignment="Center" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}, ConverterParameter=Visibility}" />
         </StackPanel>
         <Border Grid.Row="1" Background="#333" Padding="10">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
-                <TextBlock Text="관리자: Ctrl+Alt+F12" Foreground="Gray" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="관리자: Ctrl+Alt+F12" Foreground="Gray" Margin="0,0,10,0" />
                 <Button Content="관리자 화면" Command="{Binding AdminCommand}"/>
             </StackPanel>
         </Border>
