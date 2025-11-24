@@ -9,7 +9,8 @@ namespace PublicPCControl.Client.Data
     {
         public static string GetConnectionString()
         {
-            var dbPath = Path.Combine(AppContext.BaseDirectory, "Data", "publicpc.db");
+            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            var dbPath = Path.Combine(localAppData, "PublicPCControl", "Data", "publicpc.db");
             Directory.CreateDirectory(Path.GetDirectoryName(dbPath)!);
             return new SqliteConnectionStringBuilder { DataSource = dbPath }.ToString();
         }

@@ -15,7 +15,8 @@ namespace PublicPCControl.Client.Services
 
         public ConfigService()
         {
-            _configPath = Path.Combine(AppContext.BaseDirectory, "Config", "config.json");
+            var localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            _configPath = Path.Combine(localAppData, "PublicPCControl", "Config", "config.json");
             Directory.CreateDirectory(Path.GetDirectoryName(_configPath)!);
         }
 
