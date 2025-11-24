@@ -1,6 +1,5 @@
 // File: PublicPCControl.Client/MainWindow.xaml.cs
 using System.Windows;
-using PublicPCControl.Client.ViewModels;
 
 namespace PublicPCControl.Client
 {
@@ -9,7 +8,6 @@ namespace PublicPCControl.Client
         public MainWindow()
         {
             InitializeComponent();
-            DataContext = new MainViewModel();
         }
     }
 }
