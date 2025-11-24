@@ -5,3 +5,10 @@ C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\D
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\App.g.cs
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\GeneratedInternalTypeHelper.g.cs
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\PublicPCControl.Client_MarkupCompile.lref
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminView.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\SessionView.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\UserLoginView.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminView.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\LockScreenView.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\SessionView.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\UserLoginView.g.cs

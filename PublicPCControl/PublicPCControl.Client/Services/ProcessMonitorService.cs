@@ -10,7 +10,7 @@ namespace PublicPCControl.Client.Services
 {
     public class ProcessMonitorService : IDisposable
     {
-        private readonly Timer _timer;
+        private readonly System.Timers.Timer _timer;
         private readonly LoggingService _loggingService;
         private readonly Func<AppConfig> _getConfig;
         private readonly Func<Session?> _getSession;
@@ -20,7 +20,7 @@ namespace PublicPCControl.Client.Services
             _loggingService = loggingService;
             _getConfig = getConfig;
             _getSession = getSession;
-            _timer = new Timer(5000);
+            _timer = new System.Timers.Timer(5000);
             _timer.Elapsed += TimerElapsed;
         }
 

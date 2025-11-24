@@ -9,14 +9,14 @@ namespace PublicPCControl.Client.Services
 {
     public class WindowMonitorService : IDisposable
     {
-        private readonly Timer _timer;
+        private readonly System.Timers.Timer _timer;
         private readonly Action<string, string> _onWindowChanged;
         private string _lastTitle = string.Empty;
 
         public WindowMonitorService(Action<string, string> onWindowChanged)
         {
             _onWindowChanged = onWindowChanged;
-            _timer = new Timer(3000);
+            _timer = new System.Timers.Timer(3000);
             _timer.Elapsed += TimerElapsed;
         }
 
