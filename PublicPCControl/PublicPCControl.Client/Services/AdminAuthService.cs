@@ -8,16 +8,37 @@ namespace PublicPCControl.Client.Services
 {
     public class AdminAuthService
     {
+        private readonly ConfigService _configService;
+
+        public AdminAuthService(ConfigService configService)
+        {
+            _configService = configService;
+        }
+
         public bool EnsureAuthenticated(Window owner, AppConfig config)
         {
             if (string.IsNullOrWhiteSpace(config.AdminPasswordHash))
             {
+                var setupDialog = new AdminPasswordSetupWindow
+                {
+                    Owner = owner
+                };
+
+                var setupResult = setupDialog.ShowDialog();
+                if (setupResult != true || string.IsNullOrWhiteSpace(setupDialog.Password))
+                {
+                    return false;
+                }
+
+                config.AdminPasswordHash = ConfigService.HashPassword(setupDialog.Password);
+                _configService.Save(config);
+
                 MessageBox.Show(owner,
-                    "관리자 비밀번호가 설정되어 있지 않습니다. 관리자 화면에서 비밀번호를 먼저 설정해 주세요.",
-                    "관리자 인증 필요",
+                    "새 관리자 비밀번호가 설정되었습니다.",
+                    "관리자 비밀번호 설정 완료",
                     MessageBoxButton.OK,
-                    MessageBoxImage.Warning);
-                return false;
+                    MessageBoxImage.Information);
+                return true;
             }
 
             var dialog = new AdminPasswordWindow

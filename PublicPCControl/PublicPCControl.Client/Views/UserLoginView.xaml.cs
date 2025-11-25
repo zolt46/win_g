@@ -1,5 +1,6 @@
 // File: PublicPCControl.Client/Views/UserLoginView.xaml.cs
 using System.Windows.Controls;
+using System.Windows;
 
 namespace PublicPCControl.Client.Views
 {
@@ -8,6 +9,16 @@ namespace PublicPCControl.Client.Views
         public UserLoginView()
         {
             InitializeComponent();
+        }
+
+        private void OnShowConsentDetails(object sender, RoutedEventArgs e)
+        {
+            var dialog = new ConsentDetailsWindow
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            dialog.ShowDialog();
         }
     }
 }

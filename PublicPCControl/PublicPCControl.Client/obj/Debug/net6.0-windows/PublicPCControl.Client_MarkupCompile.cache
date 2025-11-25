@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\App.xaml
-6-1704772614
+8845819804
 
-32555130148
+34-1267802236
 199-1302882869
-MainWindow.xaml;Views\AdminView.xaml;Views\AdminPasswordWindow.xaml;Views\LockScreenView.xaml;Views\SessionView.xaml;Views\UserLoginView.xaml;
+MainWindow.xaml;Views\AdminView.xaml;Views\AdminPasswordWindow.xaml;Views\AdminPasswordSetupWindow.xaml;Views\ConsentDetailsWindow.xaml;Views\LockScreenView.xaml;Views\SessionView.xaml;Views\UserLoginView.xaml;
 
 False
 

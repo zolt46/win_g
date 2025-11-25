@@ -538,3 +538,7 @@ C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\R
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Release\net6.0-windows\win-x64\ref\PublicPCControl.Client.dll
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Release\net6.0-windows\win-x64\Views\AdminPasswordWindow.baml
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Release\net6.0-windows\win-x64\Views\AdminPasswordWindow.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Release\net6.0-windows\win-x64\Views\AdminPasswordSetupWindow.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Release\net6.0-windows\win-x64\Views\ConsentDetailsWindow.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Release\net6.0-windows\win-x64\Views\AdminPasswordSetupWindow.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Release\net6.0-windows\win-x64\Views\ConsentDetailsWindow.g.cs

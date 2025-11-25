@@ -16,7 +16,7 @@ namespace PublicPCControl.Client
             try
             {
                 var configService = new ConfigService();
-                var authService = new AdminAuthService();
+                var authService = new AdminAuthService(configService);
 
                 MainWindow? mainWindow = null;
                 MainViewModel viewModel = null!;

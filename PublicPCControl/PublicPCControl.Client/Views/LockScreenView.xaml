@@ -44,7 +44,15 @@
                     </Border>
                 </Grid>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,22,0,0">
-                    <Button Content="사용 시작" Padding="26,14" FontSize="22" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Background="#58c16e" Foreground="#0c1b0d" BorderBrush="#74d68a" BorderThickness="0" Width="200" Margin="0,0,12,0" />
+                    <Button Content="사용 시작" Padding="26,14" FontSize="22" FontWeight="Bold" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Background="#58c16e" Foreground="#0c1b0d" BorderBrush="#74d68a" BorderThickness="0" Width="200" Margin="0,0,12,0">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" CornerRadius="18" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
                     <Border Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}, ConverterParameter=Visibility}" Background="#2a1b10" BorderBrush="#b86a1c" BorderThickness="1" CornerRadius="12" Padding="16" Width="360">
                         <StackPanel>
                             <TextBlock Text="관리자 전용 모드" Foreground="#f2c57c" FontWeight="Bold" FontSize="16" />

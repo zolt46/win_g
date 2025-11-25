@@ -17,6 +17,8 @@
     <Page Include="MainWindow.xaml" />
     <Page Include="Views\AdminView.xaml" />
     <Page Include="Views\AdminPasswordWindow.xaml" />
+    <Page Include="Views\AdminPasswordSetupWindow.xaml" />
+    <Page Include="Views\ConsentDetailsWindow.xaml" />
     <Page Include="Views\LockScreenView.xaml" />
     <Page Include="Views\SessionView.xaml" />
     <Page Include="Views\UserLoginView.xaml" />

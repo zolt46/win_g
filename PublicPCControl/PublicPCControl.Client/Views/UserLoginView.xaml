@@ -19,38 +19,41 @@
                 <DropShadowEffect BlurRadius="24" Color="#33000000" ShadowDepth="0" />
             </Border.Effect>
             <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
 
-                <StackPanel Grid.Column="0">
+                <StackPanel Grid.Row="0" Grid.Column="0">
                     <StackPanel.Resources>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Margin" Value="0,0,0,2" />
+                            <Setter Property="Margin" Value="0,0,0,4" />
                             <Setter Property="Foreground" Value="#e2ebff" />
-                            <Setter Property="FontSize" Value="14" />
+                            <Setter Property="FontSize" Value="16" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                         <Style TargetType="TextBox">
-                            <Setter Property="Margin" Value="0,0,0,12" />
+                            <Setter Property="Margin" Value="0,0,0,14" />
                             <Setter Property="Padding" Value="12" />
                             <Setter Property="FontSize" Value="16" />
-                            <Setter Property="Background" Value="#0b1220" />
+                            <Setter Property="Background" Value="#10192c" />
                             <Setter Property="Foreground" Value="#f7fbff" />
-                            <Setter Property="BorderBrush" Value="#3e68c3" />
-                            <Setter Property="BorderThickness" Value="1.5" />
+                            <Setter Property="BorderBrush" Value="#5f85e4" />
+                            <Setter Property="BorderThickness" Value="1.6" />
                         </Style>
                         <Style TargetType="ComboBox">
-                            <Setter Property="Margin" Value="0,0,0,12" />
+                            <Setter Property="Margin" Value="0,0,0,14" />
                             <Setter Property="Padding" Value="12" />
                             <Setter Property="FontSize" Value="16" />
-                            <Setter Property="Background" Value="#0b1220" />
+                            <Setter Property="Background" Value="#10192c" />
                             <Setter Property="Foreground" Value="#f7fbff" />
-                            <Setter Property="BorderBrush" Value="#3e68c3" />
-                            <Setter Property="BorderThickness" Value="1.5" />
+                            <Setter Property="BorderBrush" Value="#5f85e4" />
+                            <Setter Property="BorderThickness" Value="1.6" />
+                            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
                         </Style>
                     </StackPanel.Resources>
                     <TextBlock Text="이름" />
@@ -61,48 +64,77 @@
                     <ComboBox ItemsSource="{Binding PurposeOptions}" SelectedItem="{Binding Purpose}" />
                     <TextBlock Text="희망 이용 시간 (분)" />
                     <TextBox Text="{Binding RequestedMinutes, UpdateSourceTrigger=PropertyChanged}" />
-                    <Border Background="#0b1324" BorderBrush="#273552" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,4,0,0">
-                        <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="#e7efff" FontWeight="SemiBold" />
+                    <Border Background="#101a2d" BorderBrush="#2d3f64" BorderThickness="1.2" CornerRadius="12" Padding="12" Margin="0,6,0,0">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="#e7efff" FontWeight="SemiBold" FontSize="15" VerticalAlignment="Center" />
+                            <Button Grid.Column="1" Content="상세보기" Click="OnShowConsentDetails" Margin="10,0,0,0" Padding="10,6" Background="#213459" Foreground="#d8e6ff" BorderBrush="#3e5b93" BorderThickness="1" Cursor="Hand" />
+                        </Grid>
                     </Border>
                 </StackPanel>
 
-                <StackPanel Grid.Column="1">
-                    <StackPanel.Resources>
-                        <Style TargetType="Button">
-                            <Setter Property="FontSize" Value="18" />
-                            <Setter Property="Padding" Value="22,14" />
-                            <Setter Property="Foreground" Value="White" />
-                            <Setter Property="BorderThickness" Value="0" />
-                            <Setter Property="Cursor" Value="Hand" />
-                            <Setter Property="FontWeight" Value="SemiBold" />
-                        </Style>
-                    </StackPanel.Resources>
-                    <Button Content="사용 시작" Command="{Binding StartCommand}" Background="#4fb36a" BorderBrush="#65d186">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Background" Value="#4fb36a" />
-                                <Setter Property="BorderBrush" Value="#65d186" />
-                                <Setter Property="Opacity" Value="0.95" />
-                                <Style.Triggers>
-                                    <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Background" Value="#23324b" />
-                                        <Setter Property="BorderBrush" Value="#2f4568" />
-                                        <Setter Property="Opacity" Value="0.6" />
-                                    </Trigger>
-                                    <Trigger Property="IsMouseOver" Value="True">
-                                        <Setter Property="Opacity" Value="1" />
-                                    </Trigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                    <Button Content="취소" Command="{Binding CancelCommand}" Background="#1f2a3d" />
-                    <Border Background="#0c1528" Padding="14" CornerRadius="12" BorderBrush="#223657" BorderThickness="1" Margin="0,6,0,0">
+                <Border Grid.Row="0" Grid.Column="1" Background="#0d1627" BorderBrush="#1f2f4b" BorderThickness="1" CornerRadius="14" Padding="18" Margin="18,0,0,0">
+                    <StackPanel>
+                        <TextBlock Text="빠른 체크" Foreground="#8eb6ff" FontSize="17" FontWeight="Bold" Margin="0,0,0,8" />
+                        <TextBlock Text="예약 시간과 용도를 확인하고, 동의 후 사용을 시작하세요. 미입력 항목이 있으면 버튼이 비활성화됩니다." Foreground="#dce7ff" TextWrapping="Wrap" FontSize="15" />
+                        <TextBlock Text="권장" Foreground="#9fd6ff" FontSize="14" FontWeight="SemiBold" Margin="0,12,0,4" />
+                        <Border Background="#0b1322" Padding="10" CornerRadius="10" BorderBrush="#233555" BorderThickness="1">
+                            <StackPanel Orientation="Vertical">
+                                <TextBlock Text="실명과 연락처를 정확히 입력" Foreground="#eaf2ff" FontSize="14" />
+                                <TextBlock Text="이용 목적은 가장 가까운 옵션으로 선택" Foreground="#eaf2ff" FontSize="14" />
+                                <TextBlock Text="세션 종료 전 데이터 백업" Foreground="#eaf2ff" FontSize="14" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Border>
+
+                <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
+                    <Border Background="#0c1528" Padding="14" CornerRadius="12" BorderBrush="#223657" BorderThickness="1" Margin="0,0,14,0">
                         <StackPanel>
-                            <TextBlock Text="입력 가이드" Foreground="#8eb6ff" FontWeight="Bold" />
-                            <TextBlock Text="모든 항목을 입력하고 동의 체크 후에만 '사용 시작' 버튼이 활성화됩니다." Foreground="#dce7ff" TextWrapping="Wrap" />
+                            <TextBlock Text="입력 가이드" Foreground="#8eb6ff" FontWeight="Bold" FontSize="15" />
+                            <TextBlock Text="모든 항목을 입력하고 동의 체크 후에만 '사용 시작' 버튼이 활성화됩니다." Foreground="#dce7ff" TextWrapping="Wrap" FontSize="14" />
                         </StackPanel>
                     </Border>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Content="취소" Command="{Binding CancelCommand}" Background="#1f2a3d" Foreground="#dfe8ff" Padding="20,12" FontSize="17" FontWeight="SemiBold" Cursor="Hand" Margin="0,0,10,0">
+                            <Button.Template>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}" CornerRadius="12" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                </ControlTemplate>
+                            </Button.Template>
+                        </Button>
+                        <Button Content="사용 시작" Command="{Binding StartCommand}" Background="#4fb36a" BorderBrush="#65d186" Foreground="#0c1b0d" Padding="24,14" FontSize="19" FontWeight="Bold" Cursor="Hand">
+                            <Button.Style>
+                                <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="0" CornerRadius="16" Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="Opacity" Value="0.95" />
+                                    <Style.Triggers>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Background" Value="#23324b" />
+                                            <Setter Property="BorderBrush" Value="#2f4568" />
+                                            <Setter Property="Opacity" Value="0.6" />
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter Property="Opacity" Value="1" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
                 </StackPanel>
             </Grid>
         </Border>
