@@ -4,35 +4,53 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" Background="#0f1524">
-    <Grid Margin="60">
+             mc:Ignorable="d" Background="#0c111c">
+    <Grid Margin="64">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical">
-            <TextBlock Text="사용자 정보 입력" Foreground="White" FontSize="26" Margin="0,0,0,8" FontWeight="Bold" />
-            <TextBlock Text="이 PC 사용 기록 및 활동 정보가 저장됩니다." Foreground="#d0d0d0" />
+        <StackPanel Orientation="Vertical" Margin="0,0,0,16">
+            <TextBlock Text="사용자 정보 입력" Foreground="#eff4ff" FontSize="28" Margin="0,0,0,6" FontWeight="Bold" />
+            <TextBlock Text="이용 목적과 연락처를 남기고 동의 후 사용을 시작하세요." Foreground="#c4d2f1" />
         </StackPanel>
-        <Border Grid.Row="1" Background="#162138" Padding="24" CornerRadius="14" BorderBrush="#24314d" BorderThickness="1">
+        <Border Grid.Row="1" Background="#0f1728" Padding="28" CornerRadius="18" BorderBrush="#1d2a42" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24" Color="#33000000" ShadowDepth="0" />
+            </Border.Effect>
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2.6*"/>
+                    <ColumnDefinition Width="3*"/>
                     <ColumnDefinition Width="2*"/>
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
                 <StackPanel Grid.Column="0">
                     <StackPanel.Resources>
-                        <Style TargetType="Control">
-                            <Setter Property="Margin" Value="0,0,0,12" />
-                            <Setter Property="Padding" Value="12,8" />
-                            <Setter Property="FontSize" Value="15" />
-                            <Setter Property="Background" Value="#f8fafc" />
-                            <Setter Property="BorderBrush" Value="#3b82f6" />
-                            <Setter Property="Foreground" Value="#0a0a0a" />
-                        </Style>
                         <Style TargetType="TextBlock">
-                            <Setter Property="Margin" Value="0,0,0,4" />
-                            <Setter Property="Foreground" Value="#e8edf8" />
+                            <Setter Property="Margin" Value="0,0,0,2" />
+                            <Setter Property="Foreground" Value="#e2ebff" />
+                            <Setter Property="FontSize" Value="14" />
+                        </Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Margin" Value="0,0,0,12" />
+                            <Setter Property="Padding" Value="12" />
+                            <Setter Property="FontSize" Value="16" />
+                            <Setter Property="Background" Value="#0b1220" />
+                            <Setter Property="Foreground" Value="#f7fbff" />
+                            <Setter Property="BorderBrush" Value="#3e68c3" />
+                            <Setter Property="BorderThickness" Value="1.5" />
+                        </Style>
+                        <Style TargetType="ComboBox">
+                            <Setter Property="Margin" Value="0,0,0,12" />
+                            <Setter Property="Padding" Value="12" />
+                            <Setter Property="FontSize" Value="16" />
+                            <Setter Property="Background" Value="#0b1220" />
+                            <Setter Property="Foreground" Value="#f7fbff" />
+                            <Setter Property="BorderBrush" Value="#3e68c3" />
+                            <Setter Property="BorderThickness" Value="1.5" />
                         </Style>
                     </StackPanel.Resources>
                     <TextBlock Text="이름" />
@@ -41,30 +59,34 @@
                     <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Text="이용 목적" />
                     <ComboBox ItemsSource="{Binding PurposeOptions}" SelectedItem="{Binding Purpose}" />
-                    <TextBlock Text="희망 이용 시간(분)" />
+                    <TextBlock Text="희망 이용 시간 (분)" />
                     <TextBox Text="{Binding RequestedMinutes, UpdateSourceTrigger=PropertyChanged}" />
-                    <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="White" Margin="0" />
+                    <Border Background="#0b1324" BorderBrush="#273552" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,4,0,0">
+                        <CheckBox IsChecked="{Binding Consent}" Content="PC 사용 기록 저장에 동의합니다." Foreground="#e7efff" FontWeight="SemiBold" />
+                    </Border>
                 </StackPanel>
-                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+
+                <StackPanel Grid.Column="1">
                     <StackPanel.Resources>
                         <Style TargetType="Button">
                             <Setter Property="FontSize" Value="18" />
-                            <Setter Property="Padding" Value="22,12" />
+                            <Setter Property="Padding" Value="22,14" />
                             <Setter Property="Foreground" Value="White" />
                             <Setter Property="BorderThickness" Value="0" />
                             <Setter Property="Cursor" Value="Hand" />
-                            <Setter Property="Margin" Value="0,0,0,10" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
                         </Style>
                     </StackPanel.Resources>
-                    <Button Content="사용 시작" Command="{Binding StartCommand}">
+                    <Button Content="사용 시작" Command="{Binding StartCommand}" Background="#4fb36a" BorderBrush="#65d186">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-                                <Setter Property="Background" Value="#3ba55c" />
-                                <Setter Property="Opacity" Value="0.9" />
-                                <Setter Property="BorderBrush" Value="#55c882" />
+                                <Setter Property="Background" Value="#4fb36a" />
+                                <Setter Property="BorderBrush" Value="#65d186" />
+                                <Setter Property="Opacity" Value="0.95" />
                                 <Style.Triggers>
                                     <Trigger Property="IsEnabled" Value="False">
-                                        <Setter Property="Background" Value="#2f3b4f" />
+                                        <Setter Property="Background" Value="#23324b" />
+                                        <Setter Property="BorderBrush" Value="#2f4568" />
                                         <Setter Property="Opacity" Value="0.6" />
                                     </Trigger>
                                     <Trigger Property="IsMouseOver" Value="True">
@@ -74,11 +96,11 @@
                             </Style>
                         </Button.Style>
                     </Button>
-                    <Button Content="취소" Command="{Binding CancelCommand}" Background="#2a3347" />
-                    <Border Background="#0f172a" Padding="12" CornerRadius="8" BorderBrush="#22304d" BorderThickness="1" Margin="0,6,0,0">
+                    <Button Content="취소" Command="{Binding CancelCommand}" Background="#1f2a3d" />
+                    <Border Background="#0c1528" Padding="14" CornerRadius="12" BorderBrush="#223657" BorderThickness="1" Margin="0,6,0,0">
                         <StackPanel>
-                            <TextBlock Text="입력 가이드" Foreground="#9db6ff" FontWeight="Bold" />
-                            <TextBlock Text="모든 항목을 입력하고 동의 체크 후에만 '사용 시작' 버튼이 활성화됩니다." Foreground="#d6e1ff" TextWrapping="Wrap" />
+                            <TextBlock Text="입력 가이드" Foreground="#8eb6ff" FontWeight="Bold" />
+                            <TextBlock Text="모든 항목을 입력하고 동의 체크 후에만 '사용 시작' 버튼이 활성화됩니다." Foreground="#dce7ff" TextWrapping="Wrap" />
                         </StackPanel>
                     </Border>
                 </StackPanel>

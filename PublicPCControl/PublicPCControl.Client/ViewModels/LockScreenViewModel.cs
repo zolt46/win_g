@@ -15,7 +15,7 @@ namespace PublicPCControl.Client.ViewModels
         public ICommand AdminCommand { get; }
 
         public string Notice => "자료열람실 공용 PC입니다. 보안을 위해 활동이 기록됩니다.";
-        public string AdminNotice => "관리자 전용 PC입니다. 일반 사용자는 사용할 수 없습니다.";
+        public string ModeLabel => IsUserAllowed ? "일반 이용" : "관리자 전용";
 
         public LockScreenViewModel(Func<AppConfig> getConfig, Action navigateToLogin, Action requestAdmin)
         {
@@ -26,11 +26,12 @@ namespace PublicPCControl.Client.ViewModels
             AdminCommand = new RelayCommand(_ => _requestAdmin());
         }
 
-        public bool IsUserAllowed => !_getConfig().IsAdminOnlyPc && _getConfig().EnforcementEnabled;
+        public bool IsUserAllowed => !_getConfig().IsAdminOnlyPc;
 
         public void Refresh()
         {
             OnPropertyChanged(nameof(IsUserAllowed));
+            OnPropertyChanged(nameof(ModeLabel));
             if (StartCommand is RelayCommand relay)
             {
                 relay.RaiseCanExecuteChanged();

@@ -4,82 +4,79 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" Background="#0f1a2b">
+             mc:Ignorable="d" Background="#0c111c">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </UserControl.Resources>
-    <Grid Margin="24">
+    <Grid Margin="28">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Border Background="#14233a" Padding="16" CornerRadius="10">
-            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                <StackPanel.Resources>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="White" />
-                    </Style>
-                    <Style TargetType="StackPanel">
-                        <Setter Property="Margin" Value="0,0,18,0" />
-                    </Style>
-                </StackPanel.Resources>
+        <Border Background="#10192a" Padding="18" CornerRadius="16" BorderBrush="#1f2c44" BorderThickness="1">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="18" Color="#22000000" ShadowDepth="0" />
+            </Border.Effect>
+            <UniformGrid Columns="5" Rows="1" Margin="0" HorizontalAlignment="Stretch">
                 <StackPanel>
-                    <TextBlock Text="사용자" />
-                    <TextBlock Text="{Binding CurrentSession.UserName}" FontSize="18" FontWeight="Bold" />
+                    <TextBlock Text="사용자" Foreground="#92a9d8" />
+                    <TextBlock Text="{Binding CurrentSession.UserName}" FontSize="19" FontWeight="Bold" Foreground="#f6fbff" />
                 </StackPanel>
                 <StackPanel>
-                    <TextBlock Text="ID" />
-                    <TextBlock Text="{Binding CurrentSession.UserId}" />
+                    <TextBlock Text="ID" Foreground="#92a9d8" />
+                    <TextBlock Text="{Binding CurrentSession.UserId}" Foreground="#f6fbff" />
                 </StackPanel>
                 <StackPanel>
-                    <TextBlock Text="이용 목적" />
-                    <TextBlock Text="{Binding CurrentSession.Purpose}" />
+                    <TextBlock Text="이용 목적" Foreground="#92a9d8" />
+                    <TextBlock Text="{Binding CurrentSession.Purpose}" Foreground="#f6fbff" />
                 </StackPanel>
                 <StackPanel>
-                    <TextBlock Text="시작 시간" />
-                    <TextBlock Text="{Binding CurrentSession.StartTime, StringFormat=yyyy-MM-dd HH:mm}" />
+                    <TextBlock Text="시작 시간" Foreground="#92a9d8" />
+                    <TextBlock Text="{Binding CurrentSession.StartTime, StringFormat=yyyy-MM-dd HH:mm}" Foreground="#f6fbff" />
                 </StackPanel>
-                <StackPanel Margin="0">
-                    <TextBlock Text="남은 시간" Foreground="LightBlue" />
-                    <StackPanel Orientation="Horizontal">
-                        <StackPanel.Resources>
-                            <Style TargetType="TextBlock">
-                                <Setter Property="Margin" Value="0,0,6,0" />
-                            </Style>
-                        </StackPanel.Resources>
-                        <TextBlock Text="{Binding Remaining}" Foreground="LightBlue" FontSize="22" />
-                        <TextBlock Text="(5분 전 경고)" Foreground="Orange" Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVis}}" />
+                <StackPanel>
+                    <TextBlock Text="남은 시간" Foreground="#92a9d8" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding Remaining}" Foreground="#6dd69b" FontSize="22" FontWeight="Bold" />
+                        <TextBlock Text="5분 전 알림" Foreground="#f4c066" Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVis}}" Margin="10,4,0,0" />
                     </StackPanel>
                 </StackPanel>
-            </StackPanel>
+            </UniformGrid>
         </Border>
-        <Border Grid.Row="1" Background="#0c182a" BorderBrush="#20304a" BorderThickness="1" CornerRadius="10" Padding="12">
+        <Border Grid.Row="1" Background="#0e1727" BorderBrush="#1d2c45" BorderThickness="1" CornerRadius="16" Padding="18" Margin="0,16,0,0">
             <Grid>
-                <Grid.Resources>
-                    <Style TargetType="Button">
-                        <Setter Property="Margin" Value="6" />
-                        <Setter Property="Padding" Value="14,10" />
-                        <Setter Property="Background" Value="#1f304a" />
-                        <Setter Property="Foreground" Value="White" />
-                        <Setter Property="BorderBrush" Value="#335c9a" />
-                    </Style>
-                </Grid.Resources>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <TextBlock Text="허용된 프로그램" Foreground="White" FontSize="16" FontWeight="Bold" />
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding AllowedPrograms}" Margin="0,8,0,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="허용된 프로그램" Foreground="#e9f1ff" FontSize="18" FontWeight="Bold" />
+                    <TextBlock Text="더블 클릭 또는 선택해 실행" Foreground="#9db3da" Margin="12,2,0,0" />
+                </StackPanel>
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding AllowedPrograms}" Margin="0,12,0,0">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Button Content="{Binding DisplayName}"
                                     Command="{Binding DataContext.LaunchProgramCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}" />
+                                    CommandParameter="{Binding}"
+                                    Padding="14,10"
+                                    Margin="6"
+                                    Background="#1d2e45"
+                                    Foreground="#f6fbff"
+                                    BorderBrush="#2f4f7c"
+                                    BorderThickness="1"
+                                    Cursor="Hand"
+                                    FontWeight="SemiBold" />
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-                <Border Background="#111a2a" Opacity="0.9" Visibility="{Binding CurrentSession, Converter={StaticResource NullToVisibilityConverter}}" CornerRadius="10" Padding="14" Grid.RowSpan="2">
+                <Border Background="#0f1524" Opacity="0.9" Visibility="{Binding CurrentSession, Converter={StaticResource NullToVisibilityConverter}}" CornerRadius="12" Padding="14" Grid.RowSpan="2">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="진행 중인 세션이 없습니다." Foreground="#d6e1ff" FontSize="16" Margin="0,0,0,6" />
                         <TextBlock Text="사용자 인증 후 자동으로 세션 정보와 남은 시간이 표시됩니다." Foreground="#9db6ff" TextWrapping="Wrap" TextAlignment="Center" Width="320" />
@@ -87,8 +84,8 @@
                 </Border>
             </Grid>
         </Border>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="사용 종료" Padding="14,8" Command="{Binding EndCommand}" Background="#b22f2f" Foreground="White" Margin="0,0,10,0" />
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="사용 종료" Padding="14,10" Command="{Binding EndCommand}" Background="#c94b4b" Foreground="White" BorderBrush="#e26b6b" BorderThickness="0" />
         </StackPanel>
     </Grid>
 </UserControl>

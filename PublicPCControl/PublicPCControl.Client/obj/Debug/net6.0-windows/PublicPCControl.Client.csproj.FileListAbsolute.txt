@@ -58,3 +58,5 @@ C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\D
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\PublicPCControl.Client.pdb
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\PublicPCControl.Client.genruntimeconfig.cache
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\ref\PublicPCControl.Client.dll
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminPasswordWindow.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminPasswordWindow.g.cs

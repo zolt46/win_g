@@ -34,12 +34,27 @@ namespace PublicPCControl.Client.Services
                 var config = _getConfig();
                 var session = _getSession();
                 if (session == null || !config.KillDisallowedProcess) return;
+
+                // 허용 목록이 비어있으면 사용자가 실행 중인 앱까지 모두 종료되어 프로그램이 닫히므로 건너뛴다.
+                if (!config.AllowedPrograms.Any()) return;
+
                 var allowedPaths = new HashSet<string>(config.AllowedPrograms.Select(a => a.ExecutablePath), StringComparer.OrdinalIgnoreCase);
+                var currentProcessId = Process.GetCurrentProcess().Id;
+                var currentProcessPath = Process.GetCurrentProcess().MainModule?.FileName ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(currentProcessPath))
+                {
+                    allowedPaths.Add(currentProcessPath);
+                }
+
                 var processes = Process.GetProcesses();
                 foreach (var p in processes)
                 {
                     try
                     {
+                        if (p.Id == currentProcessId)
+                        {
+                            continue;
+                        }
                         var path = p.MainModule?.FileName ?? string.Empty;
                         if (string.IsNullOrWhiteSpace(path)) continue;
                         if (allowedPaths.Contains(path) || path.Contains("\\Windows\\"))

@@ -6,39 +6,52 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:PublicPCControl.Client.Resources"
              xmlns:sys="clr-namespace:System;assembly=mscorlib"
-             mc:Ignorable="d" Background="#222" Focusable="True" Loaded="OnLoaded">
+             mc:Ignorable="d" Background="#0c111c" Focusable="True" Loaded="OnLoaded">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <conv:InverseBooleanConverter x:Key="InverseBool" />
     </UserControl.Resources>
     <UserControl.InputBindings>
-        <KeyBinding Key="F12" Modifiers="Control+Alt" Command="{Binding AdminCommand}" />
+        <KeyBinding Key="A" Modifiers="Control+Shift" Command="{Binding AdminCommand}" />
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Border Width="520" Padding="32" Background="#1b1b1b" CornerRadius="12" BorderBrush="#2f2f2f" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+        <Border Width="620" Padding="34" Background="#121a2a" CornerRadius="18" BorderBrush="#1f2d45" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" Color="#66000000" ShadowDepth="0" />
+            </Border.Effect>
             <StackPanel>
-                <TextBlock Text="자료열람실 공용 PC" Foreground="White" FontSize="32" HorizontalAlignment="Center" Margin="0,0,0,12" FontWeight="Bold" />
-                <TextBlock Text="{Binding Notice}" Foreground="#d0d0d0" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,16"/>
-                <Separator Margin="0,0,0,12" Background="#333" Height="1" />
-                <Button Content="사용 시작" Padding="20,12" FontSize="22" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Margin="0,0,0,16" Background="#4caf50" Foreground="White" BorderBrush="#61c26a" />
-                <TextBlock Text="{Binding AdminNotice}" Foreground="#f0b24d" TextWrapping="Wrap" TextAlignment="Center" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}, ConverterParameter=Visibility}" />
-                <Border Margin="0,24,0,0" Background="#121212" Padding="12">
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,18">
+                    <Border Width="12" Height="12" CornerRadius="6" Background="#4caf50" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Margin="0,0,10,0" />
+                    <Border Width="12" Height="12" CornerRadius="6" Background="#f0b24d" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}}" Margin="0,0,10,0" />
+                    <TextBlock Text="{Binding ModeLabel}" Foreground="#dce6ff" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                </StackPanel>
+                <TextBlock Text="자료열람실 공용 PC" Foreground="White" FontSize="34" HorizontalAlignment="Center" Margin="0,0,0,10" FontWeight="Bold" />
+                <TextBlock Text="{Binding Notice}" Foreground="#c9d7f2" TextWrapping="Wrap" TextAlignment="Center" Margin="0,0,0,20"/>
+                <Grid Margin="0,6,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Background="#1c2941" CornerRadius="14" Padding="18" BorderBrush="#223551" BorderThickness="1" Grid.ColumnSpan="2">
                         <StackPanel>
-                            <TextBlock Text="운영 모드" Foreground="#8f8f8f" FontSize="12" />
-                            <TextBlock Text="관리자 단축키: Ctrl + Alt + F12" Foreground="#c0c0c0" />
+                            <TextBlock Text="이용 안내" Foreground="#9cc3ff" FontWeight="SemiBold" FontSize="16" Margin="0,0,0,6" />
+                            <TextBlock Text="사용 시작을 누르면 기본 정보 입력 후 이용 시간이 측정됩니다. 모든 활동은 보안 목적에 따라 기록됩니다." Foreground="#e5ecff" TextWrapping="Wrap" />
                         </StackPanel>
-                        <Border Width="14" Height="14" CornerRadius="7" Background="#4caf50" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Margin="12,0,0,0"/>
-                        <TextBlock Text="사용 가능" Foreground="LightGray" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Margin="8,0,0,0" />
-                        <Border Width="14" Height="14" CornerRadius="7" Background="#f0b24d" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}}" Margin="12,0,0,0"/>
-                        <TextBlock Text="관리자 전용" Foreground="#f0b24d" Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}}" Margin="8,0,0,0" />
-                    </StackPanel>
-                </Border>
-                <TextBlock Text="초록색 원: 일반 이용 가능 / 주황색 원: 관리자 전용으로 제한됨" Foreground="#9ad8ff" TextAlignment="Center" Margin="0,10,0,0" />
+                    </Border>
+                </Grid>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,22,0,0">
+                    <Button Content="사용 시작" Padding="26,14" FontSize="22" Command="{Binding StartCommand}" Visibility="{Binding IsUserAllowed, Converter={StaticResource BoolToVis}}" Background="#58c16e" Foreground="#0c1b0d" BorderBrush="#74d68a" BorderThickness="0" Width="200" Margin="0,0,12,0" />
+                    <Border Visibility="{Binding IsUserAllowed, Converter={StaticResource InverseBool}, ConverterParameter=Visibility}" Background="#2a1b10" BorderBrush="#b86a1c" BorderThickness="1" CornerRadius="12" Padding="16" Width="360">
+                        <StackPanel>
+                            <TextBlock Text="관리자 전용 모드" Foreground="#f2c57c" FontWeight="Bold" FontSize="16" />
+                            <TextBlock Text="현재 PC는 관리자 전용으로 설정되어 있습니다. 관리자만 사용 가능합니다." Foreground="#f6e4c6" TextWrapping="Wrap" Margin="0,4,0,0" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
             </StackPanel>
         </Border>
         <Border Grid.Row="1" Background="#111" Padding="10">
