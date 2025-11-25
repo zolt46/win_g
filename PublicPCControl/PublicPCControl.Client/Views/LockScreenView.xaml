@@ -12,7 +12,7 @@
         <conv:InverseBooleanConverter x:Key="InverseBool" />
     </UserControl.Resources>
     <UserControl.InputBindings>
-        <KeyBinding Key="F12" Modifiers="Control,Alt" Command="{Binding AdminCommand}" />
+        <KeyBinding Key="F12" Modifiers="Control+Alt" Command="{Binding AdminCommand}" />
     </UserControl.InputBindings>
     <Grid>
         <Grid.RowDefinitions>
