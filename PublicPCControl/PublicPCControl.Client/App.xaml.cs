@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Windows;
+using PublicPCControl.Client.Services;
 using PublicPCControl.Client.ViewModels;
 
 namespace PublicPCControl.Client
@@ -14,10 +15,16 @@ namespace PublicPCControl.Client
 
             try
             {
-                var mainWindow = new MainWindow
-                {
-                    DataContext = new MainViewModel()
-                };
+                var configService = new ConfigService();
+                var authService = new AdminAuthService();
+
+                MainWindow? mainWindow = null;
+                MainViewModel viewModel = null!;
+                viewModel = new MainViewModel(
+                    configService,
+                    () => authService.EnsureAuthenticated(mainWindow!, viewModel.Config));
+
+                mainWindow = new MainWindow(viewModel);
                 mainWindow.Show();
             }
             catch (Exception ex)

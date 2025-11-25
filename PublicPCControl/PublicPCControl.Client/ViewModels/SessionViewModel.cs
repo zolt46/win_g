@@ -67,6 +67,15 @@ namespace PublicPCControl.Client.ViewModels
 
         public void StopTimer() => _timer.Stop();
 
+        public void ClearSession()
+        {
+            StopTimer();
+            CurrentSession = null;
+            AllowedPrograms.Clear();
+            Remaining = TimeSpan.Zero;
+            ShowWarning = false;
+        }
+
         private void TimerTick(object? sender, EventArgs e)
         {
             if (CurrentSession == null) return;

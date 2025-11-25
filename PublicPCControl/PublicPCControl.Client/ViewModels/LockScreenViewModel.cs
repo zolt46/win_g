@@ -9,7 +9,7 @@ namespace PublicPCControl.Client.ViewModels
     {
         private readonly Func<AppConfig> _getConfig;
         private readonly Action _navigateToLogin;
-        private readonly Action _showAdmin;
+        private readonly Action _requestAdmin;
 
         public ICommand StartCommand { get; }
         public ICommand AdminCommand { get; }
@@ -17,13 +17,13 @@ namespace PublicPCControl.Client.ViewModels
         public string Notice => "자료열람실 공용 PC입니다. 보안을 위해 활동이 기록됩니다.";
         public string AdminNotice => "관리자 전용 PC입니다. 일반 사용자는 사용할 수 없습니다.";
 
-        public LockScreenViewModel(Func<AppConfig> getConfig, Action navigateToLogin, Action showAdmin)
+        public LockScreenViewModel(Func<AppConfig> getConfig, Action navigateToLogin, Action requestAdmin)
         {
             _getConfig = getConfig;
             _navigateToLogin = navigateToLogin;
-            _showAdmin = showAdmin;
+            _requestAdmin = requestAdmin;
             StartCommand = new RelayCommand(_ => _navigateToLogin(), _ => IsUserAllowed);
-            AdminCommand = new RelayCommand(_ => _showAdmin());
+            AdminCommand = new RelayCommand(_ => _requestAdmin());
         }
 
         public bool IsUserAllowed => !_getConfig().IsAdminOnlyPc && _getConfig().EnforcementEnabled;

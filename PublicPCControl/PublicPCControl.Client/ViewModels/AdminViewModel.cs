@@ -1,6 +1,7 @@
 // File: PublicPCControl.Client/ViewModels/AdminViewModel.cs
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using System.Windows.Input;
 using PublicPCControl.Client.Models;
 using PublicPCControl.Client.Services;
@@ -15,6 +16,8 @@ namespace PublicPCControl.Client.ViewModels
         private AppConfig _config = new();
         private string _newProgramName = string.Empty;
         private string _newProgramPath = string.Empty;
+        private string _newAdminPassword = string.Empty;
+        private string _confirmAdminPassword = string.Empty;
 
         public ObservableCollection<AllowedProgram> AllowedPrograms { get; } = new();
 
@@ -59,6 +62,18 @@ namespace PublicPCControl.Client.ViewModels
             get => _newProgramPath;
             set => SetProperty(ref _newProgramPath, value);
         }
+        public string NewAdminPassword
+        {
+            get => _newAdminPassword;
+            set => SetProperty(ref _newAdminPassword, value);
+        }
+
+        public string ConfirmAdminPassword
+        {
+            get => _confirmAdminPassword;
+            set => SetProperty(ref _confirmAdminPassword, value);
+        }
+
 
         public ICommand AddProgramCommand { get; }
         public ICommand RemoveProgramCommand { get; }
@@ -106,6 +121,18 @@ namespace PublicPCControl.Client.ViewModels
         private void Save()
         {
             _config.AllowedPrograms = AllowedPrograms.ToList();
+            if (!string.IsNullOrWhiteSpace(NewAdminPassword))
+            {
+                if (!string.Equals(NewAdminPassword, ConfirmAdminPassword))
+                {
+                    MessageBox.Show("비밀번호와 확인 값이 일치하지 않습니다.", "비밀번호 설정 오류", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                _config.AdminPasswordHash = ConfigService.HashPassword(NewAdminPassword);
+                NewAdminPassword = string.Empty;
+                ConfirmAdminPassword = string.Empty;
+            }
             _saveCallback(_config);
             _configService.Save(_config);
         }

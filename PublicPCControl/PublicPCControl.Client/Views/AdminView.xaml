@@ -33,6 +33,10 @@
                 <TextBox Text="{Binding DefaultSessionMinutes}" />
                 <TextBlock Text="최대 이용 시간(분)" Foreground="White" />
                 <TextBox Text="{Binding MaxSessionMinutes}" />
+                <TextBlock Text="관리자 비밀번호 설정" Foreground="White" FontWeight="Bold" Margin="0,12,0,4" />
+                <PasswordBox x:Name="AdminPasswordBox" PasswordChanged="OnPasswordChanged" Tag="Primary" />
+                <PasswordBox x:Name="AdminPasswordConfirmBox" PasswordChanged="OnPasswordChanged" Tag="Confirm" />
+                <TextBlock Text="비밀번호를 비워두면 기존 값을 유지합니다." Foreground="#c6c6c6" FontSize="12" />
             </StackPanel>
             <StackPanel Grid.Column="1">
                 <StackPanel.Resources>

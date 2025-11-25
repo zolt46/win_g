@@ -9,12 +9,14 @@
     <ApplicationIcon />
     <EnableDefaultPageItems>false</EnableDefaultPageItems>
     <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
   </PropertyGroup>
 
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml" />
     <Page Include="MainWindow.xaml" />
     <Page Include="Views\AdminView.xaml" />
+    <Page Include="Views\AdminPasswordWindow.xaml" />
     <Page Include="Views\LockScreenView.xaml" />
     <Page Include="Views\SessionView.xaml" />
     <Page Include="Views\UserLoginView.xaml" />

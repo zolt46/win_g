@@ -14,6 +14,7 @@ namespace PublicPCControl.Client.ViewModels
         private readonly LoggingService _loggingService;
         private readonly ProcessMonitorService _processMonitor;
         private readonly WindowMonitorService _windowMonitor;
+        private readonly Func<bool> _authorizeAdmin;
 
         private AppConfig _config;
         private ViewModelBase? _currentViewModel;
@@ -35,10 +36,11 @@ namespace PublicPCControl.Client.ViewModels
         public SessionViewModel SessionViewModel { get; }
         public AdminViewModel AdminViewModel { get; }
 
-        public MainViewModel()
+        public MainViewModel(ConfigService? configService = null, Func<bool>? authorizeAdmin = null)
         {
             DatabaseInitializer.EnsureDatabase();
-            _configService = new ConfigService();
+            _configService = configService ?? new ConfigService();
+            _authorizeAdmin = authorizeAdmin ?? (() => true);
             _config = _configService.Load();
 
             var connectionString = DatabaseInitializer.GetConnectionString();
@@ -49,7 +51,7 @@ namespace PublicPCControl.Client.ViewModels
             _processMonitor = new ProcessMonitorService(_loggingService, () => Config, () => _sessionService.CurrentSession);
             _windowMonitor = new WindowMonitorService(OnWindowChanged);
 
-            LockScreenViewModel = new LockScreenViewModel(() => Config, NavigateToLogin, ShowAdminView);
+            LockScreenViewModel = new LockScreenViewModel(() => Config, NavigateToLogin, RequestAdminView);
             UserLoginViewModel = new UserLoginViewModel(() => Config, StartSessionFromLogin, NavigateToLockScreen);
             SessionViewModel = new SessionViewModel(_sessionService, EndSessionFromView, _loggingService);
             AdminViewModel = new AdminViewModel(_configService, UpdateConfig, NavigateToLockScreen);
@@ -75,6 +77,21 @@ namespace PublicPCControl.Client.ViewModels
             CurrentViewModel = AdminViewModel;
         }
 
+        private void RequestAdminView()
+        {
+            if (!_authorizeAdmin())
+            {
+                return;
+            }
+
+            ShowAdminView();
+        }
+
+        public void HandleAdminShortcut()
+        {
+            RequestAdminView();
+        }
+
         private void StartSessionFromLogin(UserLoginViewModel.LoginRequest request)
         {
             var session = _sessionService.StartSession(request.UserName, request.UserId, request.Purpose, request.RequestedMinutes);
@@ -92,6 +109,7 @@ namespace PublicPCControl.Client.ViewModels
             _processMonitor.Stop();
             _windowMonitor.Stop();
             _sessionService.EndSession(reason);
+            SessionViewModel.ClearSession();
             NavigateToLockScreen();
         }
 

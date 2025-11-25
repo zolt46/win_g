@@ -14,31 +14,81 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Border Background="#14233a" Padding="12" CornerRadius="8">
+        <Border Background="#14233a" Padding="16" CornerRadius="10">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <StackPanel.Resources>
                     <Style TargetType="TextBlock">
-                        <Setter Property="Margin" Value="0,0,14,0" />
+                        <Setter Property="Foreground" Value="White" />
+                    </Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Margin" Value="0,0,18,0" />
                     </Style>
                 </StackPanel.Resources>
-                <TextBlock Text="사용자:" Foreground="White" />
-                <TextBlock Text="{Binding CurrentSession.UserName}" Foreground="White" FontWeight="Bold" />
-                <TextBlock Text="ID:" Foreground="White" />
-                <TextBlock Text="{Binding CurrentSession.UserId}" Foreground="White" />
-                <TextBlock Text="남은 시간:" Foreground="LightBlue" />
-                <TextBlock Text="{Binding Remaining}" Foreground="LightBlue" FontSize="20" />
-                <TextBlock Text="(5분 전 경고)" Foreground="Orange" Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVis}}" Margin="0" />
+                <StackPanel>
+                    <TextBlock Text="사용자" />
+                    <TextBlock Text="{Binding CurrentSession.UserName}" FontSize="18" FontWeight="Bold" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="ID" />
+                    <TextBlock Text="{Binding CurrentSession.UserId}" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="이용 목적" />
+                    <TextBlock Text="{Binding CurrentSession.Purpose}" />
+                </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="시작 시간" />
+                    <TextBlock Text="{Binding CurrentSession.StartTime, StringFormat=yyyy-MM-dd HH:mm}" />
+                </StackPanel>
+                <StackPanel Margin="0">
+                    <TextBlock Text="남은 시간" Foreground="LightBlue" />
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel.Resources>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Margin" Value="0,0,6,0" />
+                            </Style>
+                        </StackPanel.Resources>
+                        <TextBlock Text="{Binding Remaining}" Foreground="LightBlue" FontSize="22" />
+                        <TextBlock Text="(5분 전 경고)" Foreground="Orange" Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVis}}" />
+                    </StackPanel>
+                </StackPanel>
             </StackPanel>
         </Border>
-        <ItemsControl Grid.Row="1" ItemsSource="{Binding AllowedPrograms}">
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Button Content="{Binding DisplayName}" Margin="6" Padding="14,8" Command="{Binding DataContext.LaunchProgramCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" />
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+        <Border Grid.Row="1" Background="#0c182a" BorderBrush="#20304a" BorderThickness="1" CornerRadius="10" Padding="12">
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="Button">
+                        <Setter Property="Margin" Value="6" />
+                        <Setter Property="Padding" Value="14,10" />
+                        <Setter Property="Background" Value="#1f304a" />
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="BorderBrush" Value="#335c9a" />
+                    </Style>
+                </Grid.Resources>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <TextBlock Text="허용된 프로그램" Foreground="White" FontSize="16" FontWeight="Bold" />
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding AllowedPrograms}" Margin="0,8,0,0">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Button Content="{Binding DisplayName}"
+                                    Command="{Binding DataContext.LaunchProgramCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                    CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <Border Background="#111a2a" Opacity="0.9" Visibility="{Binding CurrentSession, Converter={StaticResource NullToVisibilityConverter}}" CornerRadius="10" Padding="14" Grid.RowSpan="2">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="진행 중인 세션이 없습니다." Foreground="#d6e1ff" FontSize="16" Margin="0,0,0,6" />
+                        <TextBlock Text="사용자 인증 후 자동으로 세션 정보와 남은 시간이 표시됩니다." Foreground="#9db6ff" TextWrapping="Wrap" TextAlignment="Center" Width="320" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
         <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="사용 종료" Padding="14,8" Command="{Binding EndCommand}" />
+            <Button Content="사용 종료" Padding="14,8" Command="{Binding EndCommand}" Background="#b22f2f" Foreground="White" Margin="0,0,10,0" />
         </StackPanel>
     </Grid>
 </UserControl>
