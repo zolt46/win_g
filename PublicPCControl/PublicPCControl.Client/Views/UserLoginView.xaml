@@ -54,6 +54,26 @@
                             <Setter Property="BorderBrush" Value="#5f85e4" />
                             <Setter Property="BorderThickness" Value="1.6" />
                             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                            <Setter Property="Resources">
+                                <Setter.Value>
+                                    <ResourceDictionary>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#10192c" />
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#10192c" />
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="#f7fbff" />
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#3a578a" />
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#f7fbff" />
+                                    </ResourceDictionary>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter Property="ItemContainerStyle">
+                                <Setter.Value>
+                                    <Style TargetType="ComboBoxItem">
+                                        <Setter Property="Background" Value="#0f1728" />
+                                        <Setter Property="Foreground" Value="#f7fbff" />
+                                        <Setter Property="FontSize" Value="16" />
+                                    </Style>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
                     </StackPanel.Resources>
                     <TextBlock Text="이름" />
@@ -62,8 +82,12 @@
                     <TextBox Text="{Binding UserId, UpdateSourceTrigger=PropertyChanged}" />
                     <TextBlock Text="이용 목적" />
                     <ComboBox ItemsSource="{Binding PurposeOptions}" SelectedItem="{Binding Purpose}" />
-                    <TextBlock Text="희망 이용 시간 (분)" />
-                    <TextBox Text="{Binding RequestedMinutes, UpdateSourceTrigger=PropertyChanged}" />
+                    <Border Background="#0f1524" BorderBrush="#283b60" BorderThickness="1.2" CornerRadius="10" Padding="12" Margin="0,0,0,10">
+                        <StackPanel>
+                            <TextBlock Text="기본 이용 시간" Foreground="#9fd6ff" FontSize="14" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding SessionSummary}" Foreground="#dce7ff" TextWrapping="Wrap" FontSize="14" />
+                        </StackPanel>
+                    </Border>
                     <Border Background="#101a2d" BorderBrush="#2d3f64" BorderThickness="1.2" CornerRadius="12" Padding="12" Margin="0,6,0,0">
                         <Grid>
                             <Grid.ColumnDefinitions>

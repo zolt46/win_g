@@ -1,0 +1,31 @@
+<!-- File: PublicPCControl.Client/Views/AdminMaintenanceWindow.xaml -->
+<Window x:Class="PublicPCControl.Client.Views.AdminMaintenanceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="관리자 모드 (운영 일시 중지)" Height="320" Width="520"
+        WindowStartupLocation="CenterScreen" ResizeMode="CanMinimize"
+        WindowStyle="ToolWindow" Background="#0f1625">
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Border Background="#121c2f" CornerRadius="12" BorderBrush="#24385c" BorderThickness="1" Padding="16">
+            <StackPanel>
+                <TextBlock Text="운영을 잠시 중지했습니다" Foreground="#f2f6ff" FontSize="20" FontWeight="Bold" Margin="0,0,0,10" />
+                <TextBlock Text="관리자가 일반 PC처럼 사용하기 위해 프로그램을 잠시 숨겼습니다. 필요한 작업을 끝낸 뒤 아래 버튼을 눌러 다시 운영 화면으로 돌아가세요." Foreground="#d5e1ff" TextWrapping="Wrap" />
+                <Border Background="#0f1422" BorderBrush="#263a61" BorderThickness="1" CornerRadius="10" Padding="12" Margin="0,14,0,0">
+                    <StackPanel>
+                        <TextBlock Text="유의사항" Foreground="#8eb6ff" FontWeight="Bold" FontSize="15" Margin="0,0,0,6" />
+                        <TextBlock Text="- 사용자 세션이 진행 중이었다면 재개 시 기록이 계속 남습니다." Foreground="#e8efff" Margin="0,0,0,4" />
+                        <TextBlock Text="- 운영 화면으로 돌아갈 때 열려 있는 중요 창을 저장하세요." Foreground="#e8efff" />
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,14,0,0">
+            <Button Content="프로그램 운영 재개" Width="180" Padding="12,8" Click="OnResume" Background="#4fb36a" Foreground="#0c1b0d" FontWeight="Bold" />
+            <Button Content="창 닫기" Width="110" Margin="10,0,0,0" Padding="12,8" Click="OnResume" Background="#1f2a3d" Foreground="#e6ecff" />
+        </StackPanel>
+    </Grid>
+</Window>

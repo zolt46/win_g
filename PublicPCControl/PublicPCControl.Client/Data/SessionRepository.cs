@@ -20,8 +20,8 @@ namespace PublicPCControl.Client.Data
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = @"INSERT INTO sessions(pc_name, user_name, user_id, purpose, start_time, end_time, requested_minutes, end_reason)
-                               VALUES($pc, $name, $id, $purpose, $start, $end, $req, $reason);
+            cmd.CommandText = @"INSERT INTO sessions(pc_name, user_name, user_id, purpose, start_time, end_time, requested_minutes, max_extensions, extensions_used, extension_minutes, end_reason)
+                               VALUES($pc, $name, $id, $purpose, $start, $end, $req, $maxExt, $usedExt, $extMinutes, $reason);
                                SELECT last_insert_rowid();";
             cmd.Parameters.AddWithValue("$pc", session.PcName);
             cmd.Parameters.AddWithValue("$name", session.UserName);
@@ -30,6 +30,9 @@ namespace PublicPCControl.Client.Data
             cmd.Parameters.AddWithValue("$start", session.StartTime);
             cmd.Parameters.AddWithValue("$end", (object?)session.EndTime ?? DBNull.Value);
             cmd.Parameters.AddWithValue("$req", session.RequestedMinutes);
+            cmd.Parameters.AddWithValue("$maxExt", session.MaxExtensions);
+            cmd.Parameters.AddWithValue("$usedExt", session.ExtensionsUsed);
+            cmd.Parameters.AddWithValue("$extMinutes", session.ExtensionMinutes);
             cmd.Parameters.AddWithValue("$reason", session.EndReason);
             var id = (long)cmd.ExecuteScalar()!;
             return (int)id;
@@ -40,9 +43,13 @@ namespace PublicPCControl.Client.Data
             using var connection = new SqliteConnection(_connectionString);
             connection.Open();
             using var cmd = connection.CreateCommand();
-            cmd.CommandText = @"UPDATE sessions SET end_time=$end, end_reason=$reason WHERE id=$id";
+            cmd.CommandText = @"UPDATE sessions SET end_time=$end, end_reason=$reason, requested_minutes=$req, max_extensions=$maxExt, extensions_used=$usedExt, extension_minutes=$extMinutes WHERE id=$id";
             cmd.Parameters.AddWithValue("$end", (object?)session.EndTime ?? DBNull.Value);
             cmd.Parameters.AddWithValue("$reason", session.EndReason);
+            cmd.Parameters.AddWithValue("$req", session.RequestedMinutes);
+            cmd.Parameters.AddWithValue("$maxExt", session.MaxExtensions);
+            cmd.Parameters.AddWithValue("$usedExt", session.ExtensionsUsed);
+            cmd.Parameters.AddWithValue("$extMinutes", session.ExtensionMinutes);
             cmd.Parameters.AddWithValue("$id", session.Id);
             cmd.ExecuteNonQuery();
         }
@@ -67,7 +74,10 @@ namespace PublicPCControl.Client.Data
                     StartTime = reader.GetDateTime(5),
                     EndTime = reader.IsDBNull(6) ? null : reader.GetDateTime(6),
                     RequestedMinutes = reader.GetInt32(7),
-                    EndReason = reader.GetString(8)
+                    MaxExtensions = reader.GetInt32(8),
+                    ExtensionsUsed = reader.GetInt32(9),
+                    ExtensionMinutes = reader.GetInt32(10),
+                    EndReason = reader.GetString(11)
                 });
             }
             return result;

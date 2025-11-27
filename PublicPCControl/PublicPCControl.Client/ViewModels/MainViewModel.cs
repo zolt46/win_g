@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using PublicPCControl.Client.Data;
 using PublicPCControl.Client.Models;
 using PublicPCControl.Client.Services;
+using Views = PublicPCControl.Client.Views;
 
 namespace PublicPCControl.Client.ViewModels
 {
@@ -15,6 +16,8 @@ namespace PublicPCControl.Client.ViewModels
         private readonly ProcessMonitorService _processMonitor;
         private readonly WindowMonitorService _windowMonitor;
         private readonly Func<bool> _authorizeAdmin;
+        private Views.AdminMaintenanceWindow? _maintenanceWindow;
+        private bool _adminMaintenanceActive;
 
         private AppConfig _config;
         private ViewModelBase? _currentViewModel;
@@ -51,10 +54,10 @@ namespace PublicPCControl.Client.ViewModels
             _processMonitor = new ProcessMonitorService(_loggingService, () => Config, () => _sessionService.CurrentSession);
             _windowMonitor = new WindowMonitorService(OnWindowChanged);
 
-            LockScreenViewModel = new LockScreenViewModel(() => Config, NavigateToLogin, RequestAdminView);
+            LockScreenViewModel = new LockScreenViewModel(() => Config, () => _adminMaintenanceActive, NavigateToLogin, RequestAdminView);
             UserLoginViewModel = new UserLoginViewModel(() => Config, StartSessionFromLogin, NavigateToLockScreen);
             SessionViewModel = new SessionViewModel(_sessionService, EndSessionFromView, _loggingService);
-            AdminViewModel = new AdminViewModel(_configService, UpdateConfig, NavigateToLockScreen);
+            AdminViewModel = new AdminViewModel(_configService, UpdateConfig, NavigateToLockScreen, EnterAdminMaintenanceMode, ResumeFromAdminMaintenance, () => _adminMaintenanceActive);
 
             CurrentViewModel = LockScreenViewModel;
         }
@@ -94,7 +97,14 @@ namespace PublicPCControl.Client.ViewModels
 
         private void StartSessionFromLogin(UserLoginViewModel.LoginRequest request)
         {
-            var session = _sessionService.StartSession(request.UserName, request.UserId, request.Purpose, request.RequestedMinutes);
+            var config = Config;
+            var session = _sessionService.StartSession(
+                request.UserName,
+                request.UserId,
+                request.Purpose,
+                config.DefaultSessionMinutes,
+                config.AllowExtensions ? config.MaxExtensionCount : 0,
+                config.AllowExtensions ? config.SessionExtensionMinutes : 0);
             SessionViewModel.BindSession(session, Config);
             CurrentViewModel = SessionViewModel;
             if (Config.EnforcementEnabled)
@@ -113,6 +123,82 @@ namespace PublicPCControl.Client.ViewModels
             NavigateToLockScreen();
         }
 
+        private void EnterAdminMaintenanceMode()
+        {
+            if (_adminMaintenanceActive)
+            {
+                return;
+            }
+
+            _adminMaintenanceActive = true;
+            _processMonitor.Stop();
+            _windowMonitor.Stop();
+            LockScreenViewModel.Refresh();
+            AdminViewModel.NotifyMaintenanceStateChanged();
+
+            var mainWindow = System.Windows.Application.Current?.MainWindow;
+            if (mainWindow != null)
+            {
+                mainWindow.Hide();
+            }
+
+            _maintenanceWindow = new Views.AdminMaintenanceWindow
+            {
+                Owner = mainWindow
+            };
+            _maintenanceWindow.ResumeRequested += MaintenanceWindowOnResumeRequested;
+            _maintenanceWindow.Closed += MaintenanceWindowOnClosed;
+            _maintenanceWindow.Show();
+        }
+
+        private void ResumeFromAdminMaintenance()
+        {
+            if (!_adminMaintenanceActive)
+            {
+                return;
+            }
+
+            _adminMaintenanceActive = false;
+            LockScreenViewModel.Refresh();
+            AdminViewModel.NotifyMaintenanceStateChanged();
+            var maintenanceWindow = _maintenanceWindow;
+            _maintenanceWindow = null;
+            if (maintenanceWindow != null)
+            {
+                maintenanceWindow.ResumeRequested -= MaintenanceWindowOnResumeRequested;
+                maintenanceWindow.Closed -= MaintenanceWindowOnClosed;
+                if (maintenanceWindow.IsVisible)
+                {
+                    maintenanceWindow.Close();
+                }
+            }
+
+            var mainWindow = System.Windows.Application.Current?.MainWindow;
+            if (mainWindow != null)
+            {
+                mainWindow.Show();
+                mainWindow.Activate();
+            }
+
+            if (_sessionService.CurrentSession != null && Config.EnforcementEnabled)
+            {
+                _processMonitor.Start();
+                _windowMonitor.Start();
+            }
+
+            CurrentViewModel = LockScreenViewModel;
+        }
+
+        private void MaintenanceWindowOnResumeRequested(object? sender, System.EventArgs e)
+        {
+            ResumeFromAdminMaintenance();
+        }
+
+        private void MaintenanceWindowOnClosed(object? sender, System.EventArgs e)
+        {
+            ResumeFromAdminMaintenance();
+        }
+
         private void OnWindowChanged(string process, string title)
         {
             var session = _sessionService.CurrentSession;
@@ -127,6 +213,7 @@ namespace PublicPCControl.Client.ViewModels
             Config = config;
             _configService.Save(config);
             LockScreenViewModel.Refresh();
+            UserLoginViewModel.RefreshConfig();
         }
     }
 }

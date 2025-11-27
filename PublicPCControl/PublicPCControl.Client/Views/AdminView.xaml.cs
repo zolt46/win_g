@@ -1,5 +1,8 @@
 // File: PublicPCControl.Client/Views/AdminView.xaml.cs
+using System.IO;
+using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
 using PublicPCControl.Client.ViewModels;
 
 namespace PublicPCControl.Client.Views
@@ -11,20 +14,45 @@ namespace PublicPCControl.Client.Views
             InitializeComponent();
         }
 
-        private void OnPasswordChanged(object sender, System.Windows.RoutedEventArgs e)
+        private void OnBrowseProgram(object sender, RoutedEventArgs e)
         {
-            if (DataContext is not AdminViewModel vm || sender is not PasswordBox passwordBox)
+            if (DataContext is not AdminViewModel vm)
             {
                 return;
             }
 
-            if ((passwordBox.Tag as string) == "Primary")
+            var dialog = new OpenFileDialog
             {
-                vm.NewAdminPassword = passwordBox.Password;
+                Filter = "실행 파일 (*.exe)|*.exe|모든 파일 (*.*)|*.*",
+                CheckFileExists = true
+            };
+
+            if (dialog.ShowDialog(Window.GetWindow(this)) == true)
+            {
+                vm.NewProgramPath = dialog.FileName;
+                if (string.IsNullOrWhiteSpace(vm.NewProgramName))
+                {
+                    vm.NewProgramName = Path.GetFileNameWithoutExtension(dialog.FileName);
+                }
             }
-            else if ((passwordBox.Tag as string) == "Confirm")
+        }
+
+        private void OnChangePassword(object sender, RoutedEventArgs e)
+        {
+            if (DataContext is not AdminViewModel vm)
             {
-                vm.ConfirmAdminPassword = passwordBox.Password;
+                return;
+            }
+
+            var dialog = new AdminPasswordChangeWindow
+            {
+                Owner = Window.GetWindow(this)
+            };
+
+            if (dialog.ShowDialog() == true && !string.IsNullOrWhiteSpace(dialog.NewPassword))
+            {
+                vm.ApplyNewAdminPassword(dialog.NewPassword);
+                MessageBox.Show("관리자 비밀번호가 변경되었습니다.", "비밀번호 변경", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
     }

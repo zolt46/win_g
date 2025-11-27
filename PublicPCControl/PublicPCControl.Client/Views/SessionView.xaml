@@ -41,41 +41,61 @@
                         <TextBlock Text="{Binding Remaining}" Foreground="#6dd69b" FontSize="22" FontWeight="Bold" />
                         <TextBlock Text="5분 전 알림" Foreground="#f4c066" Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVis}}" Margin="10,4,0,0" />
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="연장 가능" Foreground="#9fd6ff" />
+                        <TextBlock Text="{Binding ExtensionsRemaining}" Foreground="#eaf2ff" FontWeight="Bold" Margin="6,0,0,0" />
+                        <Button Content="연장" Command="{Binding ExtendCommand}" Padding="10,6" Background="#3a547d" Foreground="#eaf2ff" BorderBrush="#4f6fb5" BorderThickness="1" Margin="8,0,0,0" />
+                    </StackPanel>
                 </StackPanel>
             </UniformGrid>
         </Border>
-        <Border Grid.Row="1" Background="#0e1727" BorderBrush="#1d2c45" BorderThickness="1" CornerRadius="16" Padding="18" Margin="0,16,0,0">
+        <Border Grid.Row="1" Background="#0e1625" BorderBrush="#1d2c45" BorderThickness="1" CornerRadius="16" Padding="18" Margin="0,16,0,0">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="허용된 프로그램" Foreground="#e9f1ff" FontSize="18" FontWeight="Bold" />
-                    <TextBlock Text="더블 클릭 또는 선택해 실행" Foreground="#9db3da" Margin="12,2,0,0" />
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="허용된 프로그램 데스크" Foreground="#e9f1ff" FontSize="18" FontWeight="Bold" />
+                    <TextBlock Text="아이콘을 눌러 실행하면 관리 창을 뒤로 두고 바로 전면으로 표시합니다." Foreground="#9db3da" />
                 </StackPanel>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding AllowedPrograms}" Margin="0,12,0,0">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal" />
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Button Content="{Binding DisplayName}"
-                                    Command="{Binding DataContext.LaunchProgramCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}"
-                                    Padding="14,10"
-                                    Margin="6"
-                                    Background="#1d2e45"
-                                    Foreground="#f6fbff"
-                                    BorderBrush="#2f4f7c"
-                                    BorderThickness="1"
-                                    Cursor="Hand"
-                                    FontWeight="SemiBold" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <Border Grid.Row="1" CornerRadius="14" Padding="10" Margin="0,12,0,0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#0d1526" Offset="0" />
+                            <GradientStop Color="#111d31" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding ProgramTiles}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Command="{Binding DataContext.LaunchProgramCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                            CommandParameter="{Binding}"
+                                            Cursor="Hand"
+                                            Margin="8"
+                                            Padding="12"
+                                            Background="#16243a"
+                                            BorderBrush="#29426a"
+                                            BorderThickness="1.2">
+                                        <StackPanel Width="120" HorizontalAlignment="Center">
+                                            <Border Background="#0f1728" CornerRadius="12" Padding="10" BorderBrush="#24375b" BorderThickness="1">
+                                                <Image Source="{Binding Icon}" Width="48" Height="48" Stretch="Uniform" />
+                                            </Border>
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#f6fbff" TextAlignment="Center" TextWrapping="Wrap" Margin="0,8,0,0" />
+                                            <TextBlock Text="{Binding ExecutablePath}" Foreground="#8da6d8" FontSize="11" TextTrimming="CharacterEllipsis" TextAlignment="Center" />
+                                        </StackPanel>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Border>
                 <Border Background="#0f1524" Opacity="0.9" Visibility="{Binding CurrentSession, Converter={StaticResource NullToVisibilityConverter}}" CornerRadius="12" Padding="14" Grid.RowSpan="2">
                     <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <TextBlock Text="진행 중인 세션이 없습니다." Foreground="#d6e1ff" FontSize="16" Margin="0,0,0,6" />
