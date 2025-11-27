@@ -5,7 +5,6 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:conv="clr-namespace:PublicPCControl.Client.Resources"
-             xmlns:sys="clr-namespace:System;assembly=mscorlib"
              mc:Ignorable="d" Background="#0c111c" Focusable="True" Loaded="OnLoaded">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
@@ -65,7 +64,7 @@
         <Border Grid.Row="1" Background="#111" Padding="10">
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <TextBlock Text="현재 시간" Foreground="#888" VerticalAlignment="Center" />
-                <TextBlock Foreground="White" VerticalAlignment="Center" Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat=HH:mm}" Margin="12,0,0,0" />
+                <TextBlock Foreground="White" VerticalAlignment="Center" Text="{Binding CurrentTime, StringFormat=HH:mm:ss}" Margin="12,0,0,0" />
             </StackPanel>
         </Border>
     </Grid>

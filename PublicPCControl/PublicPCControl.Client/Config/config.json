@@ -2,7 +2,9 @@
   "EnforcementEnabled": true,
   "IsAdminOnlyPc": false,
   "DefaultSessionMinutes": 60,
-  "MaxSessionMinutes": 120,
+  "SessionExtensionMinutes": 30,
+  "MaxExtensionCount": 2,
+  "AllowExtensions": true,
   "KillDisallowedProcess": true,
   "AllowedPrograms": [
     {

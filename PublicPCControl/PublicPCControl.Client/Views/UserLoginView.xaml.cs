@@ -18,7 +18,10 @@ namespace PublicPCControl.Client.Views
                 Owner = Window.GetWindow(this)
             };
 
-            dialog.ShowDialog();
+            if (dialog.ShowDialog() == true && DataContext is ViewModels.UserLoginViewModel vm)
+            {
+                vm.Consent = true;
+            }
         }
     }
 }

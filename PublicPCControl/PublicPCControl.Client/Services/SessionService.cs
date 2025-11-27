@@ -17,7 +17,7 @@ namespace PublicPCControl.Client.Services
             _sessionRepository = repository;
         }
 
-        public Session StartSession(string userName, string userId, string purpose, int minutes)
+        public Session StartSession(string userName, string userId, string purpose, int minutes, int maxExtensions, int extensionMinutes)
         {
             var session = new Session
             {
@@ -26,11 +26,32 @@ namespace PublicPCControl.Client.Services
                 Purpose = purpose,
                 StartTime = DateTime.Now,
                 RequestedMinutes = minutes,
+                MaxExtensions = maxExtensions,
+                ExtensionsUsed = 0,
+                ExtensionMinutes = extensionMinutes,
                 EndReason = string.Empty
             };
             session.Id = _sessionRepository.Insert(session);
             _currentSession = session;
             return session;
+        }
+
+        public bool TryExtendSession()
+        {
+            if (_currentSession == null)
+            {
+                return false;
+            }
+
+            if (_currentSession.ExtensionsUsed >= _currentSession.MaxExtensions || _currentSession.ExtensionMinutes <= 0)
+            {
+                return false;
+            }
+
+            _currentSession.ExtensionsUsed++;
+            _currentSession.RequestedMinutes += _currentSession.ExtensionMinutes;
+            _sessionRepository.Update(_currentSession);
+            return true;
         }
 
         public void EndSession(string reason)

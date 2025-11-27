@@ -8,7 +8,7 @@ namespace PublicPCControl.Client.ViewModels
 {
     public class UserLoginViewModel : ViewModelBase
     {
-        public record LoginRequest(string UserName, string UserId, string Purpose, int RequestedMinutes);
+        public record LoginRequest(string UserName, string UserId, string Purpose);
 
         private readonly Func<AppConfig> _getConfig;
         private readonly Action<LoginRequest> _startSession;
@@ -17,10 +17,14 @@ namespace PublicPCControl.Client.ViewModels
         private string _userName = string.Empty;
         private string _userId = string.Empty;
         private string _purpose = "자료검색";
-        private int _requestedMinutes;
         private bool _consent;
 
         public ObservableCollection<string> PurposeOptions { get; } = new(new[] { "자료검색", "문서작성", "기타" });
+
+        public string SessionSummary =>
+            _getConfig().AllowExtensions
+                ? $"기본 {_getConfig().DefaultSessionMinutes}분 / 회당 {_getConfig().SessionExtensionMinutes}분, {_getConfig().MaxExtensionCount}회 연장"
+                : $"기본 {_getConfig().DefaultSessionMinutes}분 (연장 불가)";
 
         public string UserName
         {
@@ -52,18 +56,6 @@ namespace PublicPCControl.Client.ViewModels
             set => SetProperty(ref _purpose, value);
         }
 
-        public int RequestedMinutes
-        {
-            get => _requestedMinutes;
-            set
-            {
-                if (SetProperty(ref _requestedMinutes, value))
-                {
-                    RaiseCanStartChanged();
-                }
-            }
-        }
-
         public bool Consent
         {
             get => _consent;
@@ -84,7 +76,6 @@ namespace PublicPCControl.Client.ViewModels
             _getConfig = getConfig;
             _startSession = startSession;
             _cancel = cancel;
-            _requestedMinutes = _getConfig().DefaultSessionMinutes;
             StartCommand = new RelayCommand(_ => ExecuteStart(), _ => CanStart());
             CancelCommand = new RelayCommand(_ => _cancel());
         }
@@ -93,12 +84,10 @@ namespace PublicPCControl.Client.ViewModels
 
         private void ExecuteStart()
         {
-            var minutes = Math.Clamp(RequestedMinutes, 5, _getConfig().MaxSessionMinutes);
-            _startSession(new LoginRequest(UserName, UserId, Purpose, minutes));
+            _startSession(new LoginRequest(UserName, UserId, Purpose));
             Consent = false;
             UserName = string.Empty;
             UserId = string.Empty;
-            RequestedMinutes = _getConfig().DefaultSessionMinutes;
         }
 
         private void RaiseCanStartChanged()
@@ -107,6 +96,11 @@ namespace PublicPCControl.Client.ViewModels
             {
                 relay.RaiseCanExecuteChanged();
             }
+        }
+
+        public void RefreshConfig()
+        {
+            OnPropertyChanged(nameof(SessionSummary));
         }
     }
 }
