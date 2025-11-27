@@ -51,6 +51,9 @@ namespace PublicPCControl.Client.Data
                     start_time TEXT,
                     end_time TEXT,
                     requested_minutes INTEGER,
+                    max_extensions INTEGER DEFAULT 0,
+                    extensions_used INTEGER DEFAULT 0,
+                    extension_minutes INTEGER DEFAULT 0,
                     end_reason TEXT
                 );",
                 @"CREATE TABLE IF NOT EXISTS process_logs (
@@ -83,6 +86,28 @@ namespace PublicPCControl.Client.Data
                 cmd.CommandText = sql;
                 cmd.ExecuteNonQuery();
             }
+
+            EnsureColumnExists(connection, "sessions", "max_extensions", "INTEGER DEFAULT 0");
+            EnsureColumnExists(connection, "sessions", "extensions_used", "INTEGER DEFAULT 0");
+            EnsureColumnExists(connection, "sessions", "extension_minutes", "INTEGER DEFAULT 0");
+        }
+
+        private static void EnsureColumnExists(SqliteConnection connection, string table, string column, string definition)
+        {
+            using var pragma = connection.CreateCommand();
+            pragma.CommandText = $"PRAGMA table_info({table});";
+            using var reader = pragma.ExecuteReader();
+            while (reader.Read())
+            {
+                if (string.Equals(reader.GetString(1), column, StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+            }
+
+            using var alter = connection.CreateCommand();
+            alter.CommandText = $"ALTER TABLE {table} ADD COLUMN {column} {definition};";
+            alter.ExecuteNonQuery();
         }
 
         private static SqliteConnection OpenWithRecovery()

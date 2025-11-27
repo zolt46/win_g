@@ -4,66 +4,148 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             mc:Ignorable="d" Background="#1a1a1a">
-    <Grid Margin="20" >
+             mc:Ignorable="d" Background="#0c111c">
+    <Grid Margin="24">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="2*"/>
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Text="관리자 설정" Foreground="White" FontSize="24" />
-        <Grid Grid.Row="1" Margin="0,12,0,12">
+
+        <StackPanel Orientation="Vertical" Margin="0,0,0,14">
+            <TextBlock Text="관리자 설정" Foreground="#eff4ff" FontSize="28" FontWeight="Bold" />
+            <TextBlock Text="운영 옵션, 허용 프로그램, 관리자 도구를 한 곳에서 관리하세요." Foreground="#c4d2f1" />
+        </StackPanel>
+
+        <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="2*"/>
-                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="2.4*" />
+                <ColumnDefinition Width="2.6*" />
             </Grid.ColumnDefinitions>
-            <StackPanel Grid.Column="0">
-                <StackPanel.Resources>
-                    <Style TargetType="Control">
-                        <Setter Property="Margin" Value="0,0,0,8" />
-                    </Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Margin" Value="0,0,0,4" />
-                    </Style>
-                </StackPanel.Resources>
-                <CheckBox Content="공용 PC 관리 기능 ON" IsChecked="{Binding EnforcementEnabled}" Foreground="White" />
-                <CheckBox Content="관리자 전용 PC" IsChecked="{Binding IsAdminOnlyPc}" Foreground="White" />
-                <CheckBox Content="허용되지 않은 프로그램 자동 종료" IsChecked="{Binding KillDisallowedProcess}" Foreground="White" />
-                <TextBlock Text="기본 이용 시간(분)" Foreground="White" />
-                <TextBox Text="{Binding DefaultSessionMinutes}" />
-                <TextBlock Text="최대 이용 시간(분)" Foreground="White" />
-                <TextBox Text="{Binding MaxSessionMinutes}" />
-                <TextBlock Text="관리자 비밀번호 설정" Foreground="White" FontWeight="Bold" Margin="0,12,0,4" />
-                <PasswordBox x:Name="AdminPasswordBox" PasswordChanged="OnPasswordChanged" Tag="Primary" />
-                <PasswordBox x:Name="AdminPasswordConfirmBox" PasswordChanged="OnPasswordChanged" Tag="Confirm" />
-                <TextBlock Text="비밀번호를 비워두면 기존 값을 유지합니다." Foreground="#c6c6c6" FontSize="12" />
-            </StackPanel>
-            <StackPanel Grid.Column="1">
-                <StackPanel.Resources>
-                    <Style TargetType="Control">
-                        <Setter Property="Margin" Value="0,0,0,8" />
-                    </Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Margin" Value="0,0,0,4" />
-                    </Style>
-                </StackPanel.Resources>
-                <TextBlock Text="허용 프로그램" Foreground="White" FontWeight="Bold" />
-                <DataGrid ItemsSource="{Binding AllowedPrograms}" AutoGenerateColumns="False" Height="200">
-                    <DataGrid.Columns>
-                        <DataGridTextColumn Header="이름" Binding="{Binding DisplayName}" Width="*" />
-                        <DataGridTextColumn Header="경로" Binding="{Binding ExecutablePath}" Width="2*" />
-                    </DataGrid.Columns>
-                </DataGrid>
-                <StackPanel Orientation="Horizontal">
-                    <TextBox Width="160" Text="{Binding NewProgramName}" Margin="0,0,6,0" />
-                    <TextBox Width="260" Text="{Binding NewProgramPath}" Margin="0,0,6,0" />
-                    <Button Content="추가" Command="{Binding AddProgramCommand}" />
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Grid.Column="0" Background="#0f1728" Padding="16" CornerRadius="16" BorderBrush="#1d2a42" BorderThickness="1" Margin="0,0,10,10">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#e2ebff" />
+                            <Setter Property="FontSize" Value="15" />
+                        </Style>
+                        <Style TargetType="CheckBox">
+                            <Setter Property="Foreground" Value="#e2ebff" />
+                            <Setter Property="Margin" Value="0,6,0,0" />
+                            <Setter Property="FontSize" Value="15" />
+                        </Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Margin" Value="0,4,0,10" />
+                            <Setter Property="Padding" Value="10" />
+                            <Setter Property="FontSize" Value="15" />
+                            <Setter Property="Background" Value="#0f192c" />
+                            <Setter Property="Foreground" Value="#f7fbff" />
+                            <Setter Property="BorderBrush" Value="#4f6fb5" />
+                            <Setter Property="BorderThickness" Value="1.4" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="운영 설정" FontWeight="Bold" FontSize="18" />
+                    <CheckBox Content="공용 PC 관리 기능 ON" IsChecked="{Binding EnforcementEnabled}" />
+                    <CheckBox Content="관리자 전용 PC" IsChecked="{Binding IsAdminOnlyPc}" />
+                    <CheckBox Content="허용되지 않은 프로그램 자동 종료" IsChecked="{Binding KillDisallowedProcess}" />
+                    <Separator Margin="0,10,0,10" />
+                    <TextBlock Text="기본 이용 시간 (분)" />
+                    <TextBox Text="{Binding DefaultSessionMinutes}" />
+                    <TextBlock Text="연장 설정" FontWeight="SemiBold" Margin="0,4,0,2" />
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Width="140" Margin="0,0,10,0">
+                            <TextBlock Text="회당 연장 (분)" />
+                            <TextBox Text="{Binding SessionExtensionMinutes}" />
+                        </StackPanel>
+                        <StackPanel Width="140" Margin="0,0,10,0">
+                            <TextBlock Text="연장 가능 횟수" />
+                            <TextBox Text="{Binding MaxExtensionCount}" />
+                        </StackPanel>
+                        <StackPanel>
+                            <TextBlock Text="연장 허용" />
+                            <CheckBox IsChecked="{Binding AllowExtensions}" Content="사용" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Border Background="#0f1524" BorderBrush="#233555" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,10,0,0">
+                        <TextBlock Text="관리자가 지정한 기본/연장 시간이 사용자 입력에 우선 적용됩니다." Foreground="#b7c8f1" TextWrapping="Wrap" />
+                    </Border>
                 </StackPanel>
-            </StackPanel>
+            </Border>
+
+            <Border Grid.Row="0" Grid.Column="1" Background="#0f1728" Padding="16" CornerRadius="16" BorderBrush="#1d2a42" BorderThickness="1" Margin="10,0,0,10">
+                <StackPanel>
+                    <StackPanel.Resources>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="#e2ebff" />
+                            <Setter Property="FontSize" Value="15" />
+                        </Style>
+                    </StackPanel.Resources>
+                    <TextBlock Text="관리자 도구" FontWeight="Bold" FontSize="18" />
+                    <Grid Margin="0,8,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Border Background="#122033" CornerRadius="12" Padding="12" BorderBrush="#203454" BorderThickness="1" Margin="0,0,10,0">
+                            <StackPanel>
+                                <TextBlock Text="관리자 모드" FontWeight="SemiBold" />
+                                <TextBlock Text="운영을 잠시 중단하고 일반 PC처럼 사용 후 쉽게 복귀합니다." Foreground="#b7c8f1" TextWrapping="Wrap" />
+                                <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+                                    <Button Content="운영 일시 중지" Command="{Binding EnterMaintenanceCommand}" Padding="12,8" Background="#3a547d" Foreground="#eaf1ff" Margin="0,0,8,0" />
+                                    <Button Content="운영 재개" Command="{Binding ResumeFromMaintenanceCommand}" Padding="12,8" Background="#4fb36a" Foreground="#0c1b0d" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                        <Border Background="#122033" CornerRadius="12" Padding="12" BorderBrush="#203454" BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock Text="관리자 비밀번호" FontWeight="SemiBold" />
+                                <TextBlock Text="비밀번호 변경 창을 통해 안전하게 갱신합니다." Foreground="#b7c8f1" TextWrapping="Wrap" />
+                                <Button Content="비밀번호 변경" Padding="12,8" Margin="0,8,0,0" Background="#3a547d" Foreground="#eaf1ff" Click="OnChangePassword" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#0f1728" Padding="16" CornerRadius="16" BorderBrush="#1d2a42" BorderThickness="1" Margin="0,10,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="허용 프로그램" FontWeight="Bold" FontSize="18" />
+                        <TextBlock Text="추가/삭제 후 저장하면 바로 반영됩니다." Foreground="#b7c8f1" Margin="8,2,0,0" />
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" ItemsSource="{Binding AllowedPrograms}" AutoGenerateColumns="False" HeadersVisibility="Column"
+                              Background="#10192c" Foreground="#eaf1ff" BorderBrush="#213459" BorderThickness="1" CanUserAddRows="False"
+                              RowBackground="#0f1728" AlternatingRowBackground="#101a2d">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="이름" Binding="{Binding DisplayName}" Width="*" />
+                            <DataGridTextColumn Header="경로" Binding="{Binding ExecutablePath}" Width="2*" />
+                            <DataGridTextColumn Header="인자" Binding="{Binding Arguments}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,10,0,0">
+                        <TextBox Width="160" Text="{Binding NewProgramName}" Margin="0,0,8,0" />
+                        <TextBox Width="260" Text="{Binding NewProgramPath}" Margin="0,0,8,0" />
+                        <Button Content="찾기" Width="70" Click="OnBrowseProgram" Margin="0,0,8,0" />
+                        <Button Content="추가" Command="{Binding AddProgramCommand}" Margin="0,0,8,0" />
+                        <Button Content="선택 삭제" Command="{Binding RemoveProgramCommand}" CommandParameter="{Binding SelectedItem, RelativeSource={RelativeSource AncestorType=DataGrid}}" />
+                    </StackPanel>
+                </Grid>
+            </Border>
         </Grid>
-        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="저장" Command="{Binding SaveCommand}" Margin="0,0,8,0" />
-            <Button Content="닫기" Command="{Binding CloseCommand}" />
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
+            <Button Content="저장" Command="{Binding SaveCommand}" Margin="0,0,10,0" Padding="18,10" Background="#4fb36a" Foreground="#0c1b0d" FontWeight="Bold" />
+            <Button Content="닫기" Command="{Binding CloseCommand}" Padding="16,10" Background="#1f2a3d" Foreground="#dfe8ff" />
         </StackPanel>
     </Grid>
 </UserControl>

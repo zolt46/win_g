@@ -41,6 +41,11 @@
                         <TextBlock Text="{Binding Remaining}" Foreground="#6dd69b" FontSize="22" FontWeight="Bold" />
                         <TextBlock Text="5분 전 알림" Foreground="#f4c066" Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVis}}" Margin="10,4,0,0" />
                     </StackPanel>
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="연장 가능" Foreground="#9fd6ff" />
+                        <TextBlock Text="{Binding ExtensionsRemaining}" Foreground="#eaf2ff" FontWeight="Bold" Margin="6,0,0,0" />
+                        <Button Content="연장" Command="{Binding ExtendCommand}" Padding="10,6" Background="#3a547d" Foreground="#eaf2ff" BorderBrush="#4f6fb5" BorderThickness="1" Margin="8,0,0,0" />
+                    </StackPanel>
                 </StackPanel>
             </UniformGrid>
         </Border>

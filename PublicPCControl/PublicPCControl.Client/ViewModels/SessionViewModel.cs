@@ -18,6 +18,9 @@ namespace PublicPCControl.Client.ViewModels
         private readonly DispatcherTimer _timer;
         private TimeSpan _remaining;
         private bool _showWarning;
+        private int _extensionsUsed;
+        private int _maxExtensions;
+        private int _extensionMinutes;
 
         public ObservableCollection<AllowedProgram> AllowedPrograms { get; } = new();
 
@@ -39,8 +42,31 @@ namespace PublicPCControl.Client.ViewModels
             set => SetProperty(ref _showWarning, value);
         }
 
+        public int ExtensionsUsed
+        {
+            get => _extensionsUsed;
+            private set => SetProperty(ref _extensionsUsed, value);
+        }
+
+        public int MaxExtensions
+        {
+            get => _maxExtensions;
+            private set => SetProperty(ref _maxExtensions, value);
+        }
+
+        public int ExtensionMinutes
+        {
+            get => _extensionMinutes;
+            private set => SetProperty(ref _extensionMinutes, value);
+        }
+
+        public int ExtensionsRemaining => Math.Max(0, MaxExtensions - ExtensionsUsed);
+
+        public bool CanExtend => CurrentSession != null && ExtensionsRemaining > 0 && ExtensionMinutes > 0;
+
         public ICommand EndCommand { get; }
         public ICommand LaunchProgramCommand { get; }
+        public ICommand ExtendCommand { get; }
 
         public SessionViewModel(SessionService sessionService, Action<string> endSession, LoggingService loggingService)
         {
@@ -51,18 +77,23 @@ namespace PublicPCControl.Client.ViewModels
             _timer.Tick += TimerTick;
             EndCommand = new RelayCommand(_ => _endSession("manual"));
             LaunchProgramCommand = new RelayCommand(p => LaunchProgram(p as AllowedProgram), p => p is AllowedProgram);
+            ExtendCommand = new RelayCommand(_ => ExtendSession(), _ => CanExtend);
         }
 
         public void BindSession(Session session, AppConfig config)
         {
             CurrentSession = session;
             Remaining = TimeSpan.FromMinutes(session.RequestedMinutes);
+            ExtensionsUsed = session.ExtensionsUsed;
+            MaxExtensions = session.MaxExtensions;
+            ExtensionMinutes = session.ExtensionMinutes;
             AllowedPrograms.Clear();
             foreach (var program in config.AllowedPrograms)
             {
                 AllowedPrograms.Add(program);
             }
             _timer.Start();
+            RaiseExtensionStateChanged();
         }
 
         public void StopTimer() => _timer.Stop();
@@ -74,6 +105,10 @@ namespace PublicPCControl.Client.ViewModels
             AllowedPrograms.Clear();
             Remaining = TimeSpan.Zero;
             ShowWarning = false;
+            ExtensionsUsed = 0;
+            MaxExtensions = 0;
+            ExtensionMinutes = 0;
+            RaiseExtensionStateChanged();
         }
 
         private void TimerTick(object? sender, EventArgs e)
@@ -85,6 +120,27 @@ namespace PublicPCControl.Client.ViewModels
             {
                 _timer.Stop();
                 _endSession("timeout");
+            }
+        }
+
+        private void ExtendSession()
+        {
+            if (_sessionService.TryExtendSession())
+            {
+                ExtensionsUsed = _sessionService.CurrentSession?.ExtensionsUsed ?? ExtensionsUsed;
+                Remaining += TimeSpan.FromMinutes(ExtensionMinutes);
+                RaiseExtensionStateChanged();
+                ShowWarning = Remaining.TotalMinutes <= 5;
+            }
+        }
+
+        private void RaiseExtensionStateChanged()
+        {
+            OnPropertyChanged(nameof(ExtensionsRemaining));
+            OnPropertyChanged(nameof(CanExtend));
+            if (ExtendCommand is RelayCommand relay)
+            {
+                relay.RaiseCanExecuteChanged();
             }
         }
 
