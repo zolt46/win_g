@@ -2,6 +2,8 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Threading;
 using PublicPCControl.Client.Models;
@@ -90,6 +92,7 @@ namespace PublicPCControl.Client.ViewModels
             AllowedPrograms.Clear();
             foreach (var program in config.AllowedPrograms)
             {
+                program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
                 AllowedPrograms.Add(program);
             }
             _timer.Start();
@@ -149,12 +152,15 @@ namespace PublicPCControl.Client.ViewModels
             if (program == null || CurrentSession == null) return;
             try
             {
-                Process.Start(new ProcessStartInfo
+                var process = Process.Start(new ProcessStartInfo
                 {
                     FileName = program.ExecutablePath,
                     Arguments = program.Arguments,
-                    UseShellExecute = true
+                    UseShellExecute = false,
+                    WorkingDirectory = System.IO.Path.GetDirectoryName(program.ExecutablePath) ?? string.Empty,
+                    WindowStyle = ProcessWindowStyle.Normal
                 });
+                BringToFront(process);
                 _loggingService.LogProcessStart(CurrentSession.Id, program.DisplayName, program.ExecutablePath);
             }
             catch (Exception ex)
@@ -162,5 +168,37 @@ namespace PublicPCControl.Client.ViewModels
                 Debug.WriteLine(ex);
             }
         }
+
+        private static void BringToFront(Process? process)
+        {
+            if (process == null)
+            {
+                return;
+            }
+
+            try
+            {
+                process.WaitForInputIdle(2000);
+                process.Refresh();
+                var handle = process.MainWindowHandle;
+                if (handle != IntPtr.Zero)
+                {
+                    ShowWindow(handle, SwRestore);
+                    SetForegroundWindow(handle);
+                }
+            }
+            catch
+            {
+                // ignored
+            }
+        }
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        private const int SwRestore = 9;
     }
 }
