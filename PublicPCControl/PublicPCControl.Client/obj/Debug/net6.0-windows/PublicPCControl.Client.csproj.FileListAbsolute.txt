@@ -64,3 +64,7 @@ C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\D
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\ConsentDetailsWindow.baml
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminPasswordSetupWindow.g.cs
 C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\ConsentDetailsWindow.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminPasswordChangeWindow.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminMaintenanceWindow.baml
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminPasswordChangeWindow.g.cs
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net6.0-windows\Views\AdminMaintenanceWindow.g.cs
