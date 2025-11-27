@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Windows;
 using PublicPCControl.Client.Models;
 using PublicPCControl.Client.Services;
 
@@ -150,6 +151,8 @@ namespace PublicPCControl.Client.ViewModels
         private void LaunchProgram(AllowedProgram? program)
         {
             if (program == null || CurrentSession == null) return;
+            var mainWindow = Application.Current?.MainWindow;
+            ReleaseTopmost(mainWindow);
             try
             {
                 var process = Process.Start(new ProcessStartInfo
@@ -160,13 +163,49 @@ namespace PublicPCControl.Client.ViewModels
                     WorkingDirectory = System.IO.Path.GetDirectoryName(program.ExecutablePath) ?? string.Empty,
                     WindowStyle = ProcessWindowStyle.Normal
                 });
+
+                if (process == null)
+                {
+                    RestoreTopmost(mainWindow);
+                    return;
+                }
+
+                process.EnableRaisingEvents = true;
+                process.Exited += (_, _) => RestoreTopmost(mainWindow);
+
                 BringToFront(process);
                 _loggingService.LogProcessStart(CurrentSession.Id, program.DisplayName, program.ExecutablePath);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
+                RestoreTopmost(mainWindow);
             }
+        }
+
+        private static void ReleaseTopmost(Window? window)
+        {
+            if (window == null)
+            {
+                return;
+            }
+
+            window.Dispatcher.Invoke(() => window.Topmost = false);
+        }
+
+        private static void RestoreTopmost(Window? window)
+        {
+            if (window == null)
+            {
+                return;
+            }
+
+            window.Dispatcher.Invoke(() =>
+            {
+                window.Topmost = true;
+                window.Activate();
+                window.Focus();
+            });
         }
 
         private static void BringToFront(Process? process)
