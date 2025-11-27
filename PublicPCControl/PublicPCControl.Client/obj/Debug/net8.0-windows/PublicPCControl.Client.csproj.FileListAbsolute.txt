@@ -1,0 +1,1 @@
+C:\Users\seewo\Desktop\window\win_g\PublicPCControl\PublicPCControl.Client\obj\Debug\net8.0-windows\PublicPCControl.Client.csproj.AssemblyReference.cache

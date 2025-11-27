@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "vaW0LGDdCSfuuVp8tZryP/mRV9MLnLCwuAvs3dmWlZrcho5ZXu0txXUYI4RGN9rDO1mCGygAvj18mdhGScQTmA==",
+  "dgSpecHash": "vS0GXdxIH3cEIakA8PkRM7IBz01IBuwmhFgO6N2t1AScHlUHW/N4LXyAVTL4libPbvAI4ZqmUwdtm0MX/pZK2g==",
   "success": true,
   "projectFilePath": "C:\\Users\\seewo\\Desktop\\window\\win_g\\PublicPCControl\\PublicPCControl.Client\\PublicPCControl.Client.csproj",
   "expectedPackageFiles": [
@@ -11,14 +11,7 @@
     "C:\\Users\\seewo\\.nuget\\packages\\sqlitepclraw.core\\2.1.2\\sqlitepclraw.core.2.1.2.nupkg.sha512",
     "C:\\Users\\seewo\\.nuget\\packages\\sqlitepclraw.lib.e_sqlite3\\2.1.2\\sqlitepclraw.lib.e_sqlite3.2.1.2.nupkg.sha512",
     "C:\\Users\\seewo\\.nuget\\packages\\sqlitepclraw.provider.e_sqlite3\\2.1.2\\sqlitepclraw.provider.e_sqlite3.2.1.2.nupkg.sha512",
-    "C:\\Users\\seewo\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512",
-    "C:\\Users\\seewo\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.29\\microsoft.netcore.app.ref.6.0.29.nupkg.sha512",
-    "C:\\Users\\seewo\\.nuget\\packages\\microsoft.netcore.app.runtime.win-x64\\6.0.29\\microsoft.netcore.app.runtime.win-x64.6.0.29.nupkg.sha512",
-    "C:\\Users\\seewo\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.29\\microsoft.windowsdesktop.app.ref.6.0.29.nupkg.sha512",
-    "C:\\Users\\seewo\\.nuget\\packages\\microsoft.windowsdesktop.app.runtime.win-x64\\6.0.29\\microsoft.windowsdesktop.app.runtime.win-x64.6.0.29.nupkg.sha512",
-    "C:\\Users\\seewo\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.29\\microsoft.aspnetcore.app.ref.6.0.29.nupkg.sha512",
-    "C:\\Users\\seewo\\.nuget\\packages\\microsoft.aspnetcore.app.runtime.win-x64\\6.0.29\\microsoft.aspnetcore.app.runtime.win-x64.6.0.29.nupkg.sha512",
-    "C:\\Users\\seewo\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\6.0.29\\microsoft.netcore.app.host.win-x64.6.0.29.nupkg.sha512"
+    "C:\\Users\\seewo\\.nuget\\packages\\system.memory\\4.5.3\\system.memory.4.5.3.nupkg.sha512"
   ],
   "logs": []
 }
