@@ -57,9 +57,58 @@ namespace PublicPCControl.Client.Services
                     continue;
                 }
 
-                foreach (var file in Directory.EnumerateFiles(location, "*.lnk", SearchOption.AllDirectories))
+                foreach (var file in SafeEnumerateFiles(location, "*.lnk"))
                 {
                     yield return file;
+                }
+            }
+        }
+
+        private static IEnumerable<string> SafeEnumerateFiles(string root, string pattern)
+        {
+            var stack = new Stack<string>();
+            stack.Push(root);
+
+            while (stack.Count > 0)
+            {
+                var current = stack.Pop();
+                IEnumerable<string> files;
+
+                try
+                {
+                    files = Directory.EnumerateFiles(current, pattern, SearchOption.TopDirectoryOnly);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    continue;
+                }
+                catch (IOException)
+                {
+                    continue;
+                }
+
+                foreach (var file in files)
+                {
+                    yield return file;
+                }
+
+                IEnumerable<string> children;
+                try
+                {
+                    children = Directory.EnumerateDirectories(current, "*", SearchOption.TopDirectoryOnly);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    continue;
+                }
+                catch (IOException)
+                {
+                    continue;
+                }
+
+                foreach (var child in children)
+                {
+                    stack.Push(child);
                 }
             }
         }

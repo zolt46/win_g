@@ -39,6 +39,12 @@
                             <Setter Property="Margin" Value="0,6,0,0" />
                             <Setter Property="FontSize" Value="15" />
                         </Style>
+                        <Style TargetType="RadioButton">
+                            <Setter Property="Foreground" Value="#e2ebff" />
+                            <Setter Property="Margin" Value="0,6,0,0" />
+                            <Setter Property="FontSize" Value="15" />
+                            <Setter Property="FontWeight" Value="SemiBold" />
+                        </Style>
                         <Style TargetType="TextBox">
                             <Setter Property="Margin" Value="0,4,0,10" />
                             <Setter Property="Padding" Value="10" />
@@ -50,8 +56,11 @@
                         </Style>
                     </StackPanel.Resources>
                     <TextBlock Text="운영 설정" FontWeight="Bold" FontSize="18" />
-                    <CheckBox Content="공용 PC 관리 기능 ON" IsChecked="{Binding EnforcementEnabled}" />
-                    <CheckBox Content="관리자 전용 PC" IsChecked="{Binding IsAdminOnlyPc}" />
+                    <TextBlock Text="공용 PC 관리와 관리자 전용 PC 중 하나는 반드시 선택됩니다." Foreground="#9fd6ff" FontSize="13" />
+                    <UniformGrid Columns="2" Margin="0,4,0,6">
+                        <RadioButton GroupName="OperatingMode" Content="공용 PC 관리 기능 ON" IsChecked="{Binding EnforcementEnabled}" />
+                        <RadioButton GroupName="OperatingMode" Content="관리자 전용 PC (관리자만 사용)" IsChecked="{Binding IsAdminOnlyPc}" />
+                    </UniformGrid>
                     <CheckBox Content="허용되지 않은 프로그램 자동 종료" IsChecked="{Binding KillDisallowedProcess}" />
                     <Separator Margin="0,10,0,10" />
                     <TextBlock Text="기본 이용 시간 (분)" />
@@ -127,8 +136,25 @@
                         <TextBlock Text="허용 프로그램" FontWeight="Bold" FontSize="18" />
                         <TextBlock Text="추가/삭제 후 저장하면 바로 반영됩니다." Foreground="#b7c8f1" Margin="8,2,0,0" />
                         <StackPanel Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
-                            <TextBox Width="240" Text="{Binding ProgramSearchText, UpdateSourceTrigger=PropertyChanged}" Background="#0d1627" Foreground="#f6fbff" BorderBrush="#36548c" BorderThickness="1.2" Padding="10" ToolTip="이름 또는 경로로 허용/추천 프로그램을 검색합니다." />
-                            <Button Content="추천 새로고침" Command="{Binding RefreshSuggestionsCommand}" Margin="8,0,0,0" Padding="12,8" Background="#24375a" Foreground="#eaf1ff" />
+                            <StackPanel>
+                                <TextBlock Text="이름/경로 검색" Foreground="#9fd6ff" FontSize="12" />
+                                <Grid Width="260">
+                                    <TextBox x:Name="ProgramSearchBox" Width="260" Text="{Binding ProgramSearchText, UpdateSourceTrigger=PropertyChanged}" Background="#0d1627" Foreground="#f6fbff" BorderBrush="#36548c" BorderThickness="1.2" Padding="10" ToolTip="이름 또는 경로로 허용/추천 프로그램을 검색합니다." />
+                                    <TextBlock Text="허용/추천 목록에서 빠르게 찾기" Foreground="#5d76a5" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Text, ElementName=ProgramSearchBox}" Value="">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Grid>
+                            </StackPanel>
+                            <Button Content="추천 새로고침" Command="{Binding RefreshSuggestionsCommand}" Padding="12,8" Background="#24375a" Foreground="#eaf1ff" Margin="8,12,0,0" />
                         </StackPanel>
                     </StackPanel>
 
@@ -145,16 +171,48 @@
                                         <Setter Property="BorderBrush" Value="#1f2f4d" />
                                     </Style>
                                 </DataGrid.Resources>
+                                <DataGrid.CellStyle>
+                                    <Style TargetType="DataGridCell">
+                                        <Setter Property="Foreground" Value="#f2f6ff" />
+                                        <Setter Property="FontSize" Value="14" />
+                                        <Setter Property="Padding" Value="10,6" />
+                                        <Setter Property="BorderThickness" Value="0" />
+                                        <Setter Property="Background" Value="Transparent" />
+                                    </Style>
+                                </DataGrid.CellStyle>
                                 <DataGrid.RowStyle>
                                     <Style TargetType="DataGridRow">
                                         <Setter Property="Foreground" Value="#eef4ff" />
                                         <Setter Property="FontSize" Value="14" />
+                                        <Setter Property="Margin" Value="2" />
+                                        <Setter Property="SnapsToDevicePixels" Value="True" />
                                     </Style>
                                 </DataGrid.RowStyle>
                                 <DataGrid.Columns>
-                                    <DataGridTextColumn Header="이름" Binding="{Binding DisplayName}" Width="1.2*" />
-                                    <DataGridTextColumn Header="경로" Binding="{Binding ExecutablePath}" Width="2*" />
-                                    <DataGridTextColumn Header="인자" Binding="{Binding Arguments}" Width="*" />
+                                    <DataGridTextColumn Header="이름" Binding="{Binding DisplayName}" Width="1.2*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#f6fbff" />
+                                                <Setter Property="TextWrapping" Value="Wrap" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="경로" Binding="{Binding ExecutablePath}" Width="2*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#d1ddff" />
+                                                <Setter Property="TextWrapping" Value="Wrap" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
+                                    <DataGridTextColumn Header="인자" Binding="{Binding Arguments}" Width="*">
+                                        <DataGridTextColumn.ElementStyle>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#f6fbff" />
+                                                <Setter Property="TextWrapping" Value="Wrap" />
+                                            </Style>
+                                        </DataGridTextColumn.ElementStyle>
+                                    </DataGridTextColumn>
                                 </DataGrid.Columns>
                             </DataGrid>
                         </Border>
@@ -194,41 +252,43 @@
 
                         <TextBlock Text="추천/단축 아이콘에서 바로 추가" FontWeight="SemiBold" Foreground="#e2ebff" FontSize="15" />
                         <Border Background="#0e1727" BorderBrush="#233555" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,6,0,0">
-                            <TextBlock Text="바탕화면과 시작 메뉴의 바로가기에서 실행 파일을 자동으로 찾아 표시합니다." Foreground="#9fb4dd" TextWrapping="Wrap" />
-                            <ListBox ItemsSource="{Binding ProgramSuggestionsView}" Margin="0,8,0,0" Background="#0f1728" Foreground="#f6fbff" BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border Background="#101a2d" CornerRadius="8" Padding="8" Margin="0,0,0,8" BorderBrush="#233555" BorderThickness="1">
-                                            <Grid>
-                                                <Grid.ColumnDefinitions>
-                                                    <ColumnDefinition Width="Auto" />
-                                                    <ColumnDefinition Width="*" />
-                                                    <ColumnDefinition Width="Auto" />
-                                                </Grid.ColumnDefinitions>
-                                                <Image Source="{Binding Icon}" Width="28" Height="28" Margin="0,0,10,0" />
-                                                <StackPanel Grid.Column="1">
-                                                    <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
-                                                    <TextBlock Text="{Binding ExecutablePath}" Foreground="#b7c8f1" FontSize="12" TextTrimming="CharacterEllipsis" />
-                                                    <TextBlock Text="{Binding Source}" Foreground="#9fd6ff" FontSize="12" />
-                                                </StackPanel>
-                                                <Button Grid.Column="2" Content="추가" Command="{Binding DataContext.UseSuggestionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#3a547d" Foreground="#eaf1ff" Padding="10,6" />
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                            <TextBlock Text="표시할 추천이 없습니다. 검색을 바꿔보거나 '추천 새로고침'을 눌러주세요." Foreground="#9fb4dd" FontSize="12" Margin="0,4,0,0">
-                                <TextBlock.Style>
-                                    <Style TargetType="TextBlock">
-                                        <Setter Property="Visibility" Value="Collapsed" />
-                                        <Style.Triggers>
-                                            <DataTrigger Binding="{Binding ProgramSuggestions.Count}" Value="0">
-                                                <Setter Property="Visibility" Value="Visible" />
-                                            </DataTrigger>
-                                        </Style.Triggers>
-                                    </Style>
-                                </TextBlock.Style>
-                            </TextBlock>
+                            <StackPanel>
+                                <TextBlock Text="바탕화면과 시작 메뉴의 바로가기에서 실행 파일을 자동으로 찾아 표시합니다. 앱 아이콘을 누르면 모바일 홈 화면에 추가하듯 바로 허용 목록에 들어갑니다." Foreground="#9fb4dd" TextWrapping="Wrap" />
+                                <ListBox ItemsSource="{Binding ProgramSuggestionsView}" Margin="0,8,0,0" Background="#0f1728" Foreground="#f6fbff" BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="#101a2d" CornerRadius="8" Padding="8" Margin="0,0,0,8" BorderBrush="#233555" BorderThickness="1">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Image Source="{Binding Icon}" Width="28" Height="28" Margin="0,0,10,0" />
+                                                    <StackPanel Grid.Column="1">
+                                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
+                                                        <TextBlock Text="{Binding ExecutablePath}" Foreground="#b7c8f1" FontSize="12" TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Text="{Binding Source}" Foreground="#9fd6ff" FontSize="12" />
+                                                    </StackPanel>
+                                                    <Button Grid.Column="2" Content="추가" Command="{Binding DataContext.UseSuggestionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#3a547d" Foreground="#eaf1ff" Padding="10,6" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+                                <TextBlock Text="표시할 추천이 없습니다. 검색을 바꿔보거나 '추천 새로고침'을 눌러주세요." Foreground="#9fb4dd" FontSize="12" Margin="0,4,0,0">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Collapsed" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ProgramSuggestions.Count}" Value="0">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                </TextBlock>
+                            </StackPanel>
                         </Border>
                     </StackPanel>
                 </Grid>
