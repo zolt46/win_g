@@ -60,6 +60,14 @@
                             <Setter Property="BorderThickness" Value="1.6" />
                             <Setter Property="HorizontalContentAlignment" Value="Left" />
                             <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+                            <Setter Property="Resources">
+                                <Setter.Value>
+                                    <ResourceDictionary>
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="#f7fbff" />
+                                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="#f7fbff" />
+                                    </ResourceDictionary>
+                                </Setter.Value>
+                            </Setter>
                             <Setter Property="ItemContainerStyle">
                                 <Setter.Value>
                                     <Style TargetType="ComboBoxItem">
