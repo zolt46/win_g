@@ -66,17 +66,50 @@ namespace PublicPCControl.Client.Services
 
         private static IEnumerable<string> SafeEnumerateFiles(string root, string pattern)
         {
-            try
+            var stack = new Stack<string>();
+            stack.Push(root);
+
+            while (stack.Count > 0)
             {
-                return Directory.EnumerateFiles(root, pattern, SearchOption.AllDirectories);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Array.Empty<string>();
-            }
-            catch (IOException)
-            {
-                return Array.Empty<string>();
+                var current = stack.Pop();
+                IEnumerable<string> files;
+
+                try
+                {
+                    files = Directory.EnumerateFiles(current, pattern, SearchOption.TopDirectoryOnly);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    continue;
+                }
+                catch (IOException)
+                {
+                    continue;
+                }
+
+                foreach (var file in files)
+                {
+                    yield return file;
+                }
+
+                IEnumerable<string> children;
+                try
+                {
+                    children = Directory.EnumerateDirectories(current, "*", SearchOption.TopDirectoryOnly);
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    continue;
+                }
+                catch (IOException)
+                {
+                    continue;
+                }
+
+                foreach (var child in children)
+                {
+                    stack.Push(child);
+                }
             }
         }
     }
