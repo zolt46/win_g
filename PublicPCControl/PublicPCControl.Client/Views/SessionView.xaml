@@ -4,9 +4,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="clr-namespace:PublicPCControl.Client.Resources"
              mc:Ignorable="d" Background="#0c111c">
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <conv:InverseBooleanConverter x:Key="InverseBool" />
     </UserControl.Resources>
     <Grid Margin="28">
         <Grid.RowDefinitions>
@@ -57,61 +60,111 @@
                 </Grid.RowDefinitions>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="허용된 프로그램" Foreground="#e9f1ff" FontSize="18" FontWeight="Bold" />
-                    <TextBlock Text="더블 클릭 또는 선택해 실행" Foreground="#9db3da" Margin="12,2,0,0" />
+                    <TextBlock Text="가상 바탕화면처럼 아이콘을 눌러 실행하세요." Foreground="#9db3da" Margin="12,2,0,0" />
                     <Border Background="#13213a" BorderBrush="#25406b" BorderThickness="1" CornerRadius="10" Padding="8,4" Margin="12,0,0,0">
-                        <TextBlock Text="아이콘을 클릭하면 창이 앞쪽으로 올라오도록 실행됩니다." Foreground="#b1c7ef" FontSize="12" />
+                        <TextBlock Text="아이콘을 클릭하면 프로그램 창이 앞쪽으로 올라오고, 종료 시 운영 화면이 다시 위로 뜹니다." Foreground="#b1c7ef" FontSize="12" />
                     </Border>
                 </StackPanel>
-                <Border Grid.Row="1" Background="#0c1423" CornerRadius="12" BorderBrush="#1d2f4b" BorderThickness="1" Padding="12" Margin="0,10,0,0">
+                <Border Grid.Row="1" CornerRadius="12" BorderBrush="#1d2f4b" BorderThickness="1" Padding="12" Margin="0,10,0,0">
+                    <Border.Background>
+                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                            <GradientStop Color="#0e1828" Offset="0" />
+                            <GradientStop Color="#0b1422" Offset="1" />
+                        </LinearGradientBrush>
+                    </Border.Background>
+
                     <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
                         <ItemsControl ItemsSource="{Binding AllowedPrograms}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel Orientation="Horizontal" />
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
+
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Button Command="{Binding DataContext.LaunchProgramCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                             CommandParameter="{Binding}"
-                                            Cursor="Hand"
-                                            Background="#111b2f"
-                                            BorderBrush="#2b4065"
-                                            BorderThickness="1"
+                                            ToolTip="{Binding ExecutablePath}"
                                             Margin="8"
                                             Padding="12"
-                                            ToolTip="{Binding ExecutablePath}">
-                                        <Button.Template>
-                                            <ControlTemplate TargetType="Button">
-                                                <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="12" Padding="{TemplateBinding Padding}">
-                                                    <StackPanel HorizontalAlignment="Center" Width="120">
-                                                        <Border Background="#0d1627" CornerRadius="10" Padding="6" Margin="0,0,0,6" Height="72" VerticalAlignment="Center">
-                                                            <Image Source="{Binding Icon}" Width="36" Height="36" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                                        </Border>
-                                                        <TextBlock Text="{Binding DisplayName}" Foreground="#f6fbff" TextAlignment="Center" FontWeight="SemiBold" TextWrapping="Wrap" />
-                                                    </StackPanel>
-                                                </Border>
-                                            </ControlTemplate>
-                                        </Button.Template>
+                                            Cursor="Hand">
+                                        <Button.Style>
+                                            <Style TargetType="Button">
+                                                <Setter Property="Background" Value="#111b2f" />
+                                                <Setter Property="BorderBrush" Value="#2b4065" />
+                                                <Setter Property="BorderThickness" Value="1" />
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate TargetType="Button">
+                                                            <Border x:Name="Outer"
+                                                                    Background="{TemplateBinding Background}"
+                                                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                                                    CornerRadius="12"
+                                                                    Padding="{TemplateBinding Padding}">
+                                                                <Border.Effect>
+                                                                    <DropShadowEffect BlurRadius="12" Color="#44000000" ShadowDepth="0" />
+                                                                </Border.Effect>
+                                                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                            </Border>
+                                                            <ControlTemplate.Triggers>
+                                                                <Trigger Property="IsMouseOver" Value="True">
+                                                                    <Setter TargetName="Outer" Property="BorderBrush" Value="#4fb36a" />
+                                                                    <Setter TargetName="Outer" Property="Background">
+                                                                        <Setter.Value>
+                                                                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                                                <GradientStop Color="#19375f" Offset="0" />
+                                                                                <GradientStop Color="#123152" Offset="1" />
+                                                                            </LinearGradientBrush>
+                                                                        </Setter.Value>
+                                                                    </Setter>
+                                                                </Trigger>
+                                                            </ControlTemplate.Triggers>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </Button.Style>
+
+                                        <StackPanel HorizontalAlignment="Center" Width="130">
+                                            <Border CornerRadius="12"
+                                                    Padding="8"
+                                                    Margin="0,0,0,6"
+                                                    Height="86"
+                                                    VerticalAlignment="Center"
+                                                    BorderBrush="#2e446e"
+                                                    BorderThickness="1">
+                                                <Border.Background>
+                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                                        <GradientStop Color="#152544" Offset="0" />
+                                                        <GradientStop Color="#0e1a30" Offset="1" />
+                                                    </LinearGradientBrush>
+                                                </Border.Background>
+                                                <Image Source="{Binding Icon}"
+                                                       Width="40"
+                                                       Height="40"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       Foreground="#f6fbff"
+                                                       TextAlignment="Center"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap" />
+                                        </StackPanel>
                                     </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
-                        <TextBlock Text="허용된 프로그램이 없습니다. 관리자에게 목록을 요청해 주세요." Foreground="#9db6ff" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center">
-                            <TextBlock.Style>
-                                <Style TargetType="TextBlock">
-                                    <Setter Property="Visibility" Value="Collapsed" />
-                                    <Style.Triggers>
-                                        <DataTrigger Binding="{Binding AllowedPrograms.Count}" Value="0">
-                                            <Setter Property="Visibility" Value="Visible" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </TextBlock.Style>
-                        </TextBlock>
+
+                        <TextBlock Text="허용된 프로그램이 없습니다. 관리자에게 목록을 요청해 주세요."
+                                   Foreground="#9db6ff"
+                                   FontSize="14"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center"
+                                   TextAlignment="Center"
+                                   Visibility="{Binding HasAllowedPrograms, Converter={StaticResource InverseBool}}" />
                     </Grid>
                 </Border>
                 <Border Background="#0f1524" Opacity="0.9" Visibility="{Binding CurrentSession, Converter={StaticResource NullToVisibilityConverter}}" CornerRadius="12" Padding="14" Grid.RowSpan="2">
