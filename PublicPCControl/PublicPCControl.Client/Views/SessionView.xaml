@@ -16,71 +16,45 @@
                     ToolTip="{Binding ExecutablePath}"
                     Margin="8"
                     Padding="12"
-                    Cursor="Hand">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Background" Value="#111b2f" />
-                        <Setter Property="BorderBrush" Value="#2b4065" />
-                        <Setter Property="BorderThickness" Value="1" />
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Border x:Name="Outer"
-                                            Background="{TemplateBinding Background}"
-                                            BorderBrush="{TemplateBinding BorderBrush}"
-                                            BorderThickness="{TemplateBinding BorderThickness}"
-                                            CornerRadius="12"
-                                            Padding="{TemplateBinding Padding}">
-                                        <Border.Effect>
-                                            <DropShadowEffect BlurRadius="12" Color="#44000000" ShadowDepth="0" />
-                                        </Border.Effect>
-                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    </Border>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter TargetName="Outer" Property="BorderBrush" Value="#4fb36a" />
-                                            <Setter TargetName="Outer" Property="Background">
-                                                <Setter.Value>
-                                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                                        <GradientStop Color="#19375f" Offset="0" />
-                                                        <GradientStop Color="#123152" Offset="1" />
-                                                    </LinearGradientBrush>
-                                                </Setter.Value>
-                                            </Setter>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Button.Style>
-
-                <StackPanel HorizontalAlignment="Center" Width="130">
-                    <Border CornerRadius="12"
-                            Padding="8"
-                            Margin="0,0,0,6"
-                            Height="86"
-                            VerticalAlignment="Center"
-                            BorderBrush="#2e446e"
-                            BorderThickness="1">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#152544" Offset="0" />
-                                <GradientStop Color="#0e1a30" Offset="1" />
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <Image Source="{Binding Icon}"
-                               Width="40"
-                               Height="40"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center" />
-                    </Border>
-                    <TextBlock Text="{Binding DisplayName}"
-                               Foreground="#f6fbff"
-                               TextAlignment="Center"
-                               FontWeight="SemiBold"
-                               TextWrapping="Wrap" />
-                </StackPanel>
+                    Cursor="Hand"
+                    Background="#111b2f"
+                    BorderBrush="#2b4065"
+                    BorderThickness="1">
+                <Border CornerRadius="12"
+                        Padding="12"
+                        Background="#111b2f"
+                        BorderBrush="#2b4065"
+                        BorderThickness="1.2">
+                    <Border.Effect>
+                        <DropShadowEffect BlurRadius="12" Color="#33000000" ShadowDepth="0" />
+                    </Border.Effect>
+                    <StackPanel HorizontalAlignment="Center" Width="130">
+                        <Border CornerRadius="12"
+                                Padding="8"
+                                Margin="0,0,0,6"
+                                Height="86"
+                                VerticalAlignment="Center"
+                                BorderBrush="#2e446e"
+                                BorderThickness="1">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#152544" Offset="0" />
+                                    <GradientStop Color="#0e1a30" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Image Source="{Binding Icon}"
+                                   Width="40"
+                                   Height="40"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="{Binding DisplayName}"
+                                   Foreground="#f6fbff"
+                                   TextAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                </Border>
             </Button>
         </DataTemplate>
     </UserControl.Resources>
