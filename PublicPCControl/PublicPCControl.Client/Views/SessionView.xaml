@@ -189,16 +189,30 @@
                                         </Button.Style>
 
                                         <StackPanel HorizontalAlignment="Center" Width="130">
-                                            <Border CornerRadius="12" Padding="8" Margin="0,0,0,6" Height="86" VerticalAlignment="Center" BorderBrush="#2e446e" BorderThickness="1">
+                                            <Border CornerRadius="12"
+                                                    Padding="8"
+                                                    Margin="0,0,0,6"
+                                                    Height="86"
+                                                    VerticalAlignment="Center"
+                                                    BorderBrush="#2e446e"
+                                                    BorderThickness="1">
                                                 <Border.Background>
                                                     <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
                                                         <GradientStop Color="#152544" Offset="0" />
                                                         <GradientStop Color="#0e1a30" Offset="1" />
                                                     </LinearGradientBrush>
                                                 </Border.Background>
-                                                <Image Source="{Binding Icon}" Width="40" Height="40" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                <Image Source="{Binding Icon}"
+                                                       Width="40"
+                                                       Height="40"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center" />
                                             </Border>
-                                            <TextBlock Text="{Binding DisplayName}" Foreground="#f6fbff" TextAlignment="Center" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding DisplayName}"
+                                                       Foreground="#f6fbff"
+                                                       TextAlignment="Center"
+                                                       FontWeight="SemiBold"
+                                                       TextWrapping="Wrap" />
                                         </StackPanel>
                                     </Button>
                                 </DataTemplate>
