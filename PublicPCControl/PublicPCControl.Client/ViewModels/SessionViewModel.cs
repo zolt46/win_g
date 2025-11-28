@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Windows.Input;
 using System.Windows.Threading;
+using System.Windows;
 using PublicPCControl.Client.Models;
 using PublicPCControl.Client.Services;
 
@@ -23,8 +24,15 @@ namespace PublicPCControl.Client.ViewModels
         private int _extensionsUsed;
         private int _maxExtensions;
         private int _extensionMinutes;
+        private bool _hasAllowedPrograms;
 
         public ObservableCollection<AllowedProgram> AllowedPrograms { get; } = new();
+
+        public bool HasAllowedPrograms
+        {
+            get => _hasAllowedPrograms;
+            private set => SetProperty(ref _hasAllowedPrograms, value);
+        }
 
         public Session? CurrentSession
         {
@@ -77,6 +85,7 @@ namespace PublicPCControl.Client.ViewModels
             _loggingService = loggingService;
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick += TimerTick;
+            AllowedPrograms.CollectionChanged += (_, _) => UpdateHasAllowedPrograms();
             EndCommand = new RelayCommand(_ => _endSession("manual"));
             LaunchProgramCommand = new RelayCommand(p => LaunchProgram(p as AllowedProgram), p => p is AllowedProgram);
             ExtendCommand = new RelayCommand(_ => ExtendSession(), _ => CanExtend);
@@ -95,6 +104,7 @@ namespace PublicPCControl.Client.ViewModels
                 program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
                 AllowedPrograms.Add(program);
             }
+            UpdateHasAllowedPrograms();
             _timer.Start();
             RaiseExtensionStateChanged();
         }
@@ -111,6 +121,7 @@ namespace PublicPCControl.Client.ViewModels
             ExtensionsUsed = 0;
             MaxExtensions = 0;
             ExtensionMinutes = 0;
+            UpdateHasAllowedPrograms();
             RaiseExtensionStateChanged();
         }
 
@@ -124,6 +135,11 @@ namespace PublicPCControl.Client.ViewModels
                 _timer.Stop();
                 _endSession("timeout");
             }
+        }
+
+        private void UpdateHasAllowedPrograms()
+        {
+            HasAllowedPrograms = AllowedPrograms.Count > 0;
         }
 
         private void ExtendSession()
@@ -150,6 +166,8 @@ namespace PublicPCControl.Client.ViewModels
         private void LaunchProgram(AllowedProgram? program)
         {
             if (program == null || CurrentSession == null) return;
+            var mainWindow = Application.Current?.MainWindow;
+            ReleaseTopmost(mainWindow);
             try
             {
                 var process = Process.Start(new ProcessStartInfo
@@ -160,13 +178,49 @@ namespace PublicPCControl.Client.ViewModels
                     WorkingDirectory = System.IO.Path.GetDirectoryName(program.ExecutablePath) ?? string.Empty,
                     WindowStyle = ProcessWindowStyle.Normal
                 });
+
+                if (process == null)
+                {
+                    RestoreTopmost(mainWindow);
+                    return;
+                }
+
+                process.EnableRaisingEvents = true;
+                process.Exited += (_, _) => RestoreTopmost(mainWindow);
+
                 BringToFront(process);
                 _loggingService.LogProcessStart(CurrentSession.Id, program.DisplayName, program.ExecutablePath);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
+                RestoreTopmost(mainWindow);
             }
+        }
+
+        private static void ReleaseTopmost(Window? window)
+        {
+            if (window == null)
+            {
+                return;
+            }
+
+            window.Dispatcher.Invoke(() => window.Topmost = false);
+        }
+
+        private static void RestoreTopmost(Window? window)
+        {
+            if (window == null)
+            {
+                return;
+            }
+
+            window.Dispatcher.Invoke(() =>
+            {
+                window.Topmost = true;
+                window.Activate();
+                window.Focus();
+            });
         }
 
         private static void BringToFront(Process? process)
