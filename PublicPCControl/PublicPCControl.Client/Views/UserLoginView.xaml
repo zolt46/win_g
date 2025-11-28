@@ -46,6 +46,10 @@
                             <Setter Property="BorderThickness" Value="1.6" />
                         </Style>
                         <Style TargetType="ComboBox">
+                            <Style.Resources>
+                                <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="#f7fbff" />
+                                <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}" Color="#f7fbff" />
+                            </Style.Resources>
                             <Setter Property="Margin" Value="0,0,0,14" />
                             <Setter Property="Padding" Value="12" />
                             <Setter Property="FontSize" Value="16" />
