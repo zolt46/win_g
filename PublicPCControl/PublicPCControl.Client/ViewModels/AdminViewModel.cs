@@ -1,4 +1,5 @@
 // File: PublicPCControl.Client/ViewModels/AdminViewModel.cs
+using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.IO;
@@ -289,10 +290,18 @@ namespace PublicPCControl.Client.ViewModels
         private void LoadProgramSuggestions()
         {
             ProgramSuggestions.Clear();
-            foreach (var suggestion in ProgramDiscoveryService.FindSuggestions())
+            try
             {
-                ProgramSuggestions.Add(suggestion);
+                foreach (var suggestion in ProgramDiscoveryService.FindSuggestions())
+                {
+                    ProgramSuggestions.Add(suggestion);
+                }
             }
+            catch (Exception ex)
+            {
+                ErrorReporter.Log("AdminView", ex);
+            }
+
             ProgramSuggestionsView.Refresh();
         }
 
