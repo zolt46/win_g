@@ -24,8 +24,15 @@ namespace PublicPCControl.Client.ViewModels
         private int _extensionsUsed;
         private int _maxExtensions;
         private int _extensionMinutes;
+        private bool _hasAllowedPrograms;
 
         public ObservableCollection<AllowedProgram> AllowedPrograms { get; } = new();
+
+        public bool HasAllowedPrograms
+        {
+            get => _hasAllowedPrograms;
+            private set => SetProperty(ref _hasAllowedPrograms, value);
+        }
 
         public Session? CurrentSession
         {
@@ -78,6 +85,7 @@ namespace PublicPCControl.Client.ViewModels
             _loggingService = loggingService;
             _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _timer.Tick += TimerTick;
+            AllowedPrograms.CollectionChanged += (_, _) => UpdateHasAllowedPrograms();
             EndCommand = new RelayCommand(_ => _endSession("manual"));
             LaunchProgramCommand = new RelayCommand(p => LaunchProgram(p as AllowedProgram), p => p is AllowedProgram);
             ExtendCommand = new RelayCommand(_ => ExtendSession(), _ => CanExtend);
@@ -96,6 +104,7 @@ namespace PublicPCControl.Client.ViewModels
                 program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
                 AllowedPrograms.Add(program);
             }
+            UpdateHasAllowedPrograms();
             _timer.Start();
             RaiseExtensionStateChanged();
         }
@@ -112,6 +121,7 @@ namespace PublicPCControl.Client.ViewModels
             ExtensionsUsed = 0;
             MaxExtensions = 0;
             ExtensionMinutes = 0;
+            UpdateHasAllowedPrograms();
             RaiseExtensionStateChanged();
         }
 
@@ -125,6 +135,11 @@ namespace PublicPCControl.Client.ViewModels
                 _timer.Stop();
                 _endSession("timeout");
             }
+        }
+
+        private void UpdateHasAllowedPrograms()
+        {
+            HasAllowedPrograms = AllowedPrograms.Count > 0;
         }
 
         private void ExtendSession()

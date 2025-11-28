@@ -9,6 +9,7 @@
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <conv:NullToVisibilityConverter x:Key="NullToVisibilityConverter" />
+        <conv:InverseBooleanConverter x:Key="InverseBool" />
         <conv:ZeroToVisibilityConverter x:Key="ZeroToVisibilityConverter" />
     </UserControl.Resources>
     <Grid Margin="28">
@@ -131,6 +132,7 @@
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
+                        <TextBlock Text="허용된 프로그램이 없습니다. 관리자에게 목록을 요청해 주세요." Foreground="#9db6ff" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" Visibility="{Binding HasAllowedPrograms, Converter={StaticResource InverseBool}}" />
                         <TextBlock Text="허용된 프로그램이 없습니다. 관리자에게 목록을 요청해 주세요." Foreground="#9db6ff" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" TextAlignment="Center" Visibility="{Binding AllowedPrograms.Count, Converter={StaticResource ZeroToVisibilityConverter}}" />
                     </Grid>
                 </Border>
