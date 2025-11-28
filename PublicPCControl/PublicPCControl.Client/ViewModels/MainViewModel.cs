@@ -87,7 +87,19 @@ namespace PublicPCControl.Client.ViewModels
                 return;
             }
 
-            ShowAdminView();
+            try
+            {
+                ShowAdminView();
+            }
+            catch (Exception ex)
+            {
+                Services.ErrorReporter.Log("AdminView", ex);
+                System.Windows.MessageBox.Show(
+                    "관리자 화면을 여는 중 오류가 발생했습니다.\n잠시 후 다시 시도하거나 error.log를 확인해 주세요.",
+                    "관리자 화면 오류",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
+            }
         }
 
         public void HandleAdminShortcut()
@@ -97,20 +109,32 @@ namespace PublicPCControl.Client.ViewModels
 
         private void StartSessionFromLogin(UserLoginViewModel.LoginRequest request)
         {
-            var config = Config;
-            var session = _sessionService.StartSession(
-                request.UserName,
-                request.UserId,
-                request.Purpose,
-                config.DefaultSessionMinutes,
-                config.AllowExtensions ? config.MaxExtensionCount : 0,
-                config.AllowExtensions ? config.SessionExtensionMinutes : 0);
-            SessionViewModel.BindSession(session, Config);
-            CurrentViewModel = SessionViewModel;
-            if (Config.EnforcementEnabled)
+            try
             {
-                _processMonitor.Start();
-                _windowMonitor.Start();
+                var config = Config;
+                var session = _sessionService.StartSession(
+                    request.UserName,
+                    request.UserId,
+                    request.Purpose,
+                    config.DefaultSessionMinutes,
+                    config.AllowExtensions ? config.MaxExtensionCount : 0,
+                    config.AllowExtensions ? config.SessionExtensionMinutes : 0);
+                SessionViewModel.BindSession(session, Config);
+                CurrentViewModel = SessionViewModel;
+                if (Config.EnforcementEnabled)
+                {
+                    _processMonitor.Start();
+                    _windowMonitor.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                Services.ErrorReporter.Log("StartSession", ex);
+                System.Windows.MessageBox.Show(
+                    "세션을 시작하는 중 오류가 발생했습니다.\n입력 정보를 확인 후 다시 시도하거나 error.log를 관리자에게 전달해 주세요.",
+                    "세션 시작 오류",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Error);
             }
         }
 
