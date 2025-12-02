@@ -135,6 +135,7 @@
                     <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="허용 프로그램" FontWeight="Bold" FontSize="18" />
                         <TextBlock Text="추가/삭제 후 저장하면 바로 반영됩니다." Foreground="#b7c8f1" Margin="8,2,0,0" />
+                        <TextBlock Text="추천 기준: 시작 메뉴/바탕화면 바로가기(.lnk)에서 확인된 실행 파일" Foreground="#9fd6ff" Margin="14,2,0,0" FontSize="12" />
                         <StackPanel Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
                             <StackPanel>
                                 <TextBlock Text="이름/경로 검색" Foreground="#9fd6ff" FontSize="12" />
@@ -154,7 +155,7 @@
                                     </TextBlock>
                                 </Grid>
                             </StackPanel>
-                            <Button Content="추천 새로고침" Command="{Binding RefreshSuggestionsCommand}" Padding="12,8" Background="#24375a" Foreground="#eaf1ff" Margin="8,12,0,0" />
+                            <Button Content="추천 창 열기" Padding="12,8" Background="#24375a" Foreground="#eaf1ff" Margin="8,12,0,0" Click="OnOpenSuggestions" />
                         </StackPanel>
                     </StackPanel>
 
@@ -250,44 +251,15 @@
                             </StackPanel>
                         </Border>
 
-                        <TextBlock Text="추천/단축 아이콘에서 바로 추가" FontWeight="SemiBold" Foreground="#e2ebff" FontSize="15" />
+                        <TextBlock Text="추천/단축 아이콘" FontWeight="SemiBold" Foreground="#e2ebff" FontSize="15" />
                         <Border Background="#0e1727" BorderBrush="#233555" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,6,0,0">
                             <StackPanel>
-                                <TextBlock Text="바탕화면과 시작 메뉴의 바로가기에서 실행 파일을 자동으로 찾아 표시합니다. 앱 아이콘을 누르면 모바일 홈 화면에 추가하듯 바로 허용 목록에 들어갑니다." Foreground="#9fb4dd" TextWrapping="Wrap" />
-                                <ListBox ItemsSource="{Binding ProgramSuggestionsView}" Margin="0,8,0,0" Background="#0f1728" Foreground="#f6fbff" BorderThickness="0" ScrollViewer.VerticalScrollBarVisibility="Auto">
-                                    <ListBox.ItemTemplate>
-                                        <DataTemplate>
-                                            <Border Background="#101a2d" CornerRadius="8" Padding="8" Margin="0,0,0,8" BorderBrush="#233555" BorderThickness="1">
-                                                <Grid>
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="Auto" />
-                                                        <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <Image Source="{Binding Icon}" Width="28" Height="28" Margin="0,0,10,0" />
-                                                    <StackPanel Grid.Column="1">
-                                                        <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" />
-                                                        <TextBlock Text="{Binding ExecutablePath}" Foreground="#b7c8f1" FontSize="12" TextTrimming="CharacterEllipsis" />
-                                                        <TextBlock Text="{Binding Source}" Foreground="#9fd6ff" FontSize="12" />
-                                                    </StackPanel>
-                                                    <Button Grid.Column="2" Content="추가" Command="{Binding DataContext.UseSuggestionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" CommandParameter="{Binding}" Background="#3a547d" Foreground="#eaf1ff" Padding="10,6" />
-                                                </Grid>
-                                            </Border>
-                                        </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                                <TextBlock Text="표시할 추천이 없습니다. 검색을 바꿔보거나 '추천 새로고침'을 눌러주세요." Foreground="#9fb4dd" FontSize="12" Margin="0,4,0,0">
-                                    <TextBlock.Style>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="Visibility" Value="Collapsed" />
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding ProgramSuggestions.Count}" Value="0">
-                                                    <Setter Property="Visibility" Value="Visible" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </TextBlock.Style>
-                                </TextBlock>
+                                <TextBlock Text="추천은 시작 메뉴·바탕화면의 바로가기(.lnk)를 뒤져서 실제 실행 파일이 존재하는 항목만 보여줍니다." Foreground="#9fb4dd" TextWrapping="Wrap" />
+                                <TextBlock Text="자주 쓰는 프로그램만 따로 보고 싶다면 아래 버튼으로 전용 창을 열어 추가하세요." Foreground="#9fb4dd" TextWrapping="Wrap" Margin="0,6,0,0" />
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                    <Button Content="추천 새로고침" Command="{Binding RefreshSuggestionsCommand}" Padding="12,8" Background="#24375a" Foreground="#eaf1ff" />
+                                    <Button Content="추천 창 열기" Margin="8,0,0,0" Padding="12,8" Background="#3a547d" Foreground="#eaf1ff" Click="OnOpenSuggestions" />
+                                </StackPanel>
                             </StackPanel>
                         </Border>
                     </StackPanel>

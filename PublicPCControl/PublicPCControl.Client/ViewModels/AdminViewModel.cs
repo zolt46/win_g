@@ -21,6 +21,8 @@ namespace PublicPCControl.Client.ViewModels
         private readonly System.Action _resumeFromMaintenance;
         private readonly System.Func<bool> _isMaintenanceActive;
         private AppConfig _config = new();
+        private bool _isRefreshing;
+        private bool _hasUnsavedChanges;
         private string _newProgramName = string.Empty;
         private string _newProgramPath = string.Empty;
         private string _newProgramArguments = string.Empty;
@@ -48,6 +50,7 @@ namespace PublicPCControl.Client.ViewModels
                     _config.IsAdminOnlyPc = true;
                     OnPropertyChanged(nameof(IsAdminOnlyPc));
                 }
+                MarkDirty();
                 OnPropertyChanged();
             }
         }
@@ -68,6 +71,7 @@ namespace PublicPCControl.Client.ViewModels
                     _config.EnforcementEnabled = true;
                     OnPropertyChanged(nameof(EnforcementEnabled));
                 }
+                MarkDirty();
                 OnPropertyChanged();
             }
         }
@@ -75,31 +79,37 @@ namespace PublicPCControl.Client.ViewModels
         public int DefaultSessionMinutes
         {
             get => _config.DefaultSessionMinutes;
-            set { _config.DefaultSessionMinutes = value; OnPropertyChanged(); }
+            set { _config.DefaultSessionMinutes = value; MarkDirty(); OnPropertyChanged(); }
         }
 
         public int SessionExtensionMinutes
         {
             get => _config.SessionExtensionMinutes;
-            set { _config.SessionExtensionMinutes = value; OnPropertyChanged(); }
+            set { _config.SessionExtensionMinutes = value; MarkDirty(); OnPropertyChanged(); }
         }
 
         public int MaxExtensionCount
         {
             get => _config.MaxExtensionCount;
-            set { _config.MaxExtensionCount = value; OnPropertyChanged(); }
+            set { _config.MaxExtensionCount = value; MarkDirty(); OnPropertyChanged(); }
         }
 
         public bool AllowExtensions
         {
             get => _config.AllowExtensions;
-            set { _config.AllowExtensions = value; OnPropertyChanged(); }
+            set { _config.AllowExtensions = value; MarkDirty(); OnPropertyChanged(); }
         }
 
         public bool KillDisallowedProcess
         {
             get => _config.KillDisallowedProcess;
-            set { _config.KillDisallowedProcess = value; OnPropertyChanged(); }
+            set { _config.KillDisallowedProcess = value; MarkDirty(); OnPropertyChanged(); }
+        }
+
+        public bool HasUnsavedChanges
+        {
+            get => _hasUnsavedChanges;
+            private set => SetProperty(ref _hasUnsavedChanges, value);
         }
 
         public string NewProgramName
@@ -171,7 +181,7 @@ namespace PublicPCControl.Client.ViewModels
             AddProgramCommand = new RelayCommand(_ => AddProgram(), _ => !string.IsNullOrWhiteSpace(NewProgramName) && !string.IsNullOrWhiteSpace(NewProgramPath));
             RemoveProgramCommand = new RelayCommand(p => RemoveProgram(p as AllowedProgram), p => p is AllowedProgram);
             SaveCommand = new RelayCommand(_ => Save());
-            CloseCommand = new RelayCommand(_ => _close());
+            CloseCommand = new RelayCommand(_ => CloseWithSave());
             EnterMaintenanceCommand = new RelayCommand(_ => _enterMaintenance());
             ResumeFromMaintenanceCommand = new RelayCommand(_ => _resumeFromMaintenance(), _ => _isMaintenanceActive());
             RefreshSuggestionsCommand = new RelayCommand(_ => LoadProgramSuggestions());
@@ -187,6 +197,7 @@ namespace PublicPCControl.Client.ViewModels
 
         public void Refresh(AppConfig config)
         {
+            _isRefreshing = true;
             _config = config;
             AllowedPrograms.Clear();
             foreach (var program in _config.AllowedPrograms)
@@ -197,6 +208,8 @@ namespace PublicPCControl.Client.ViewModels
             OnPropertyChanged(string.Empty);
             EnsureModeSelected();
             LoadProgramSuggestions();
+            HasUnsavedChanges = false;
+            _isRefreshing = false;
             if (ResumeFromMaintenanceCommand is RelayCommand relay)
             {
                 relay.RaiseCanExecuteChanged();
@@ -229,6 +242,7 @@ namespace PublicPCControl.Client.ViewModels
             program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
             AllowedPrograms.Add(program);
             _config.AllowedPrograms = AllowedPrograms.ToList();
+            MarkDirty();
             NewProgramName = string.Empty;
             NewProgramPath = string.Empty;
             NewProgramArguments = string.Empty;
@@ -237,9 +251,9 @@ namespace PublicPCControl.Client.ViewModels
         public void Save()
         {
             _config.AllowedPrograms = AllowedPrograms.ToList();
-            if (_config.DefaultSessionMinutes < 5)
+            if (_config.DefaultSessionMinutes <= 0)
             {
-                _config.DefaultSessionMinutes = 5;
+                _config.DefaultSessionMinutes = 1;
             }
             if (_config.SessionExtensionMinutes < 0)
             {
@@ -251,6 +265,7 @@ namespace PublicPCControl.Client.ViewModels
             }
             _saveCallback(_config);
             _configService.Save(_config);
+            HasUnsavedChanges = false;
         }
 
         public void ApplyNewAdminPassword(string password)
@@ -258,6 +273,7 @@ namespace PublicPCControl.Client.ViewModels
             _config.AdminPasswordHash = ConfigService.HashPassword(password);
             _saveCallback(_config);
             _configService.Save(_config);
+            HasUnsavedChanges = false;
         }
 
         private void RemoveProgram(AllowedProgram? program)
@@ -265,6 +281,7 @@ namespace PublicPCControl.Client.ViewModels
             if (program == null) return;
             AllowedPrograms.Remove(program);
             _config.AllowedPrograms = AllowedPrograms.ToList();
+            MarkDirty();
         }
 
         private void ApplySuggestion(ProgramSuggestion? suggestion)
@@ -303,6 +320,26 @@ namespace PublicPCControl.Client.ViewModels
             }
 
             ProgramSuggestionsView.Refresh();
+        }
+
+        private void CloseWithSave()
+        {
+            if (HasUnsavedChanges)
+            {
+                Save();
+            }
+
+            _close();
+        }
+
+        private void MarkDirty()
+        {
+            if (_isRefreshing)
+            {
+                return;
+            }
+
+            HasUnsavedChanges = true;
         }
 
         private bool FilterPrograms(object obj)

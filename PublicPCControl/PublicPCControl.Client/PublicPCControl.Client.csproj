@@ -24,6 +24,7 @@
     <Page Include="Views\LockScreenView.xaml" />
     <Page Include="Views\SessionView.xaml" />
     <Page Include="Views\UserLoginView.xaml" />
+    <Page Include="Views\ProgramSuggestionsWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
