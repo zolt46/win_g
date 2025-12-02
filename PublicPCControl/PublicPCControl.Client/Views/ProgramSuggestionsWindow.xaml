@@ -5,8 +5,8 @@
         Title="추천 프로그램 추가" Height="560" Width="760"
         WindowStartupLocation="CenterOwner" Background="#0f1728"
         ResizeMode="CanResize"
-        MaxHeight="{x:Static SystemParameters.WorkAreaHeight}"
-        MaxWidth="{x:Static SystemParameters.WorkAreaWidth}">
+        MaxHeight="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Height}"
+        MaxWidth="{Binding Source={x:Static SystemParameters.WorkArea}, Path=Width}">
     <Grid Margin="18">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
