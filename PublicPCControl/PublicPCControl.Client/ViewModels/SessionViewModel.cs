@@ -174,9 +174,10 @@ namespace PublicPCControl.Client.ViewModels
                 {
                     FileName = program.ExecutablePath,
                     Arguments = program.Arguments,
-                    UseShellExecute = false,
+                    UseShellExecute = true,
                     WorkingDirectory = System.IO.Path.GetDirectoryName(program.ExecutablePath) ?? string.Empty,
-                    WindowStyle = ProcessWindowStyle.Normal
+                    WindowStyle = ProcessWindowStyle.Normal,
+                    Verb = "open"
                 });
 
                 if (process == null)
@@ -188,7 +189,7 @@ namespace PublicPCControl.Client.ViewModels
                 process.EnableRaisingEvents = true;
                 process.Exited += (_, _) => RestoreTopmost(mainWindow);
 
-                BringToFront(process);
+                EnsureForegroundWindow(process, program.ExecutablePath);
                 _loggingService.LogProcessStart(CurrentSession.Id, program.DisplayName, program.ExecutablePath);
             }
             catch (Exception ex)
@@ -223,28 +224,62 @@ namespace PublicPCControl.Client.ViewModels
             });
         }
 
-        private static void BringToFront(Process? process)
+        private static void EnsureForegroundWindow(Process? process, string executablePath)
         {
-            if (process == null)
+            var stopAt = DateTime.UtcNow + TimeSpan.FromSeconds(5);
+            while (DateTime.UtcNow < stopAt)
             {
-                return;
-            }
-
-            try
-            {
-                process.WaitForInputIdle(2000);
-                process.Refresh();
-                var handle = process.MainWindowHandle;
+                var handle = TryGetWindowHandle(process, executablePath);
                 if (handle != IntPtr.Zero)
                 {
                     ShowWindow(handle, SwRestore);
                     SetForegroundWindow(handle);
+                    return;
+                }
+
+                System.Threading.Thread.Sleep(200);
+            }
+        }
+
+        private static IntPtr TryGetWindowHandle(Process? startedProcess, string executablePath)
+        {
+            try
+            {
+                if (startedProcess != null)
+                {
+                    startedProcess.WaitForInputIdle(1000);
+                    startedProcess.Refresh();
+                    if (startedProcess.MainWindowHandle != IntPtr.Zero)
+                    {
+                        return startedProcess.MainWindowHandle;
+                    }
+                }
+
+                var exeName = Path.GetFileNameWithoutExtension(executablePath);
+                foreach (var process in Process.GetProcessesByName(exeName))
+                {
+                    try
+                    {
+                        var mainModulePath = process.MainModule?.FileName;
+                        if (!string.IsNullOrEmpty(mainModulePath)
+                            && mainModulePath.Equals(executablePath, StringComparison.OrdinalIgnoreCase)
+                            && process.MainWindowHandle != IntPtr.Zero)
+                        {
+                            return process.MainWindowHandle;
+                        }
+                    }
+                    catch
+                    {
+                        // ignore processes that cannot be inspected
+                    }
                 }
             }
             catch
             {
                 // ignored
             }
+
+            return IntPtr.Zero;
         }
 
         [DllImport("user32.dll")]
