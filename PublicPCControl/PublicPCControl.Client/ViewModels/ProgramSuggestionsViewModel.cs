@@ -18,7 +18,7 @@ namespace PublicPCControl.Client.ViewModels
         private readonly Func<ProgramSuggestion, bool> _canDisplay;
         private string _searchText = string.Empty;
 
-        public ObservableCollection<ProgramSuggestion> Suggestions { get; } = new();
+        public ObservableCollection<ProgramSuggestion> Suggestions { get; } = new ObservableCollection<ProgramSuggestion>();
 
         public ICollectionView SuggestionsView { get; }
 
@@ -87,7 +87,8 @@ namespace PublicPCControl.Client.ViewModels
 
         private bool FilterSuggestion(object obj)
         {
-            if (obj is not ProgramSuggestion suggestion)
+            var suggestion = obj as ProgramSuggestion;
+            if (suggestion == null)
             {
                 return false;
             }

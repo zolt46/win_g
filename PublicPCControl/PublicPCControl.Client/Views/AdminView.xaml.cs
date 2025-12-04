@@ -19,7 +19,8 @@ namespace PublicPCControl.Client.Views
 
         private void OnBrowseProgram(object sender, RoutedEventArgs e)
         {
-            if (DataContext is not AdminViewModel vm)
+            var vm = DataContext as AdminViewModel;
+            if (vm == null)
             {
                 return;
             }
@@ -42,7 +43,8 @@ namespace PublicPCControl.Client.Views
 
         private void OnChangePassword(object sender, RoutedEventArgs e)
         {
-            if (DataContext is not AdminViewModel vm)
+            var vm = DataContext as AdminViewModel;
+            if (vm == null)
             {
                 return;
             }

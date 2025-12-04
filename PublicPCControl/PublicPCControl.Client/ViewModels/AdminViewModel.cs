@@ -21,7 +21,7 @@ namespace PublicPCControl.Client.ViewModels
         private readonly System.Action _enterMaintenance;
         private readonly System.Action _resumeFromMaintenance;
         private readonly System.Func<bool> _isMaintenanceActive;
-        private AppConfig _config = new();
+        private AppConfig _config = new AppConfig();
         private bool _isRefreshing;
         private bool _hasUnsavedChanges;
         private string _newProgramName = string.Empty;
@@ -29,7 +29,7 @@ namespace PublicPCControl.Client.ViewModels
         private string _newProgramArguments = string.Empty;
         private string _programSearchText = string.Empty;
 
-        public ObservableCollection<AllowedProgram> AllowedPrograms { get; } = new();
+        public ObservableCollection<AllowedProgram> AllowedPrograms { get; } = new ObservableCollection<AllowedProgram>();
 
         public ICollectionView AllowedProgramsView { get; }
 
@@ -314,12 +314,27 @@ namespace PublicPCControl.Client.ViewModels
 
         private void MarkDirty()
         {
-            if (_isRefreshing)
+            var program = obj as AllowedProgram;
+            if (program == null)
             {
                 return;
             }
 
             HasUnsavedChanges = true;
+        }
+
+        private void EnsureModeSelected()
+        {
+            if (!_config.EnforcementEnabled && !_config.IsAdminOnlyPc)
+            {
+                _config.EnforcementEnabled = true;
+                OnPropertyChanged(nameof(EnforcementEnabled));
+            }
+        }
+
+        public bool IsAlreadyAllowed(string executablePath)
+        {
+            return AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase));
         }
 
         private void EnsureModeSelected()
@@ -347,6 +362,7 @@ namespace PublicPCControl.Client.ViewModels
 
                 return false;
             }
+        }
 
             if (IsAlreadyAllowed(program.ExecutablePath))
             {
@@ -357,66 +373,16 @@ namespace PublicPCControl.Client.ViewModels
 
                 return false;
             }
+            AllowedPrograms.Add(program);
+            _config.AllowedPrograms = AllowedPrograms.ToList();
+            MarkDirty();
+            return true;
         }
 
             if (program.Icon == null)
             {
                 program.Icon = IconHelper.LoadIcon(program.ExecutablePath);
             }
-            AllowedPrograms.Add(program);
-            _config.AllowedPrograms = AllowedPrograms.ToList();
-            MarkDirty();
-            return true;
-        }
-
-        private void OpenSuggestions()
-        {
-            var window = new Views.ProgramSuggestionsWindow();
-            var viewModel = new ProgramSuggestionsViewModel(
-                ProgramDiscoveryService.FindSuggestions,
-                suggestion => ApplySuggestion(suggestion, true),
-                suggestion => !IsAlreadyAllowed(suggestion.ExecutablePath));
-            window.DataContext = viewModel;
-            window.Owner = Application.Current?.MainWindow;
-            window.ShowDialog();
-        }
-
-        public bool IsAlreadyAllowed(string executablePath)
-        {
-            return AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private bool TryAddProgram(AllowedProgram program, bool showMessages)
-        {
-            if (!File.Exists(program.ExecutablePath))
-            {
-                if (showMessages)
-                {
-                    MessageBox.Show("실행 파일 경로가 존재하지 않습니다.", "경로 확인", MessageBoxButton.OK, MessageBoxImage.Warning);
-                }
-
-                return false;
-            }
-
-            if (IsAlreadyAllowed(program.ExecutablePath))
-            {
-                if (showMessages)
-                {
-                    MessageBox.Show("이미 동일한 경로가 허용 목록에 있습니다.", "중복 추가", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
-
-                return false;
-            }
-        }
-
-            program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
-            AllowedPrograms.Add(program);
-            _config.AllowedPrograms = AllowedPrograms.ToList();
-            MarkDirty();
-            return true;
-        }
-
-            program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
             AllowedPrograms.Add(program);
             _config.AllowedPrograms = AllowedPrograms.ToList();
             MarkDirty();
