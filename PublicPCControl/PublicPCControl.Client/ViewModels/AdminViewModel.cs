@@ -309,20 +309,38 @@ namespace PublicPCControl.Client.ViewModels
             HasUnsavedChanges = true;
         }
 
-        private bool FilterPrograms(object obj)
+        private void CloseWithSave()
         {
-            if (obj is not AllowedProgram program)
+            if (HasUnsavedChanges)
             {
-                return false;
+                Save();
             }
 
-            if (string.IsNullOrWhiteSpace(ProgramSearchText))
+            _close();
+        }
+
+        private void MarkDirty()
+        {
+            if (_isRefreshing)
             {
-                return true;
+                return;
             }
 
-            return program.DisplayName.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase)
-                   || program.ExecutablePath.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase);
+            HasUnsavedChanges = true;
+        }
+
+        private void EnsureModeSelected()
+        {
+            if (!_config.EnforcementEnabled && !_config.IsAdminOnlyPc)
+            {
+                _config.EnforcementEnabled = true;
+                OnPropertyChanged(nameof(EnforcementEnabled));
+            }
+        }
+
+        public bool IsAlreadyAllowed(string executablePath)
+        {
+            return AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase));
         }
 
         private void EnsureModeSelected()
