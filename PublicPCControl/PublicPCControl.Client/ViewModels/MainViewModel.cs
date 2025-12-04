@@ -50,7 +50,8 @@ namespace PublicPCControl.Client.ViewModels
             var sessionRepository = new SessionRepository(connectionString);
             var logRepository = new LogRepository(connectionString);
             _sessionService = new SessionService(sessionRepository);
-            _loggingService = new LoggingService(logRepository);
+            var auditLogWriter = new AuditLogWriter();
+            _loggingService = new LoggingService(logRepository, auditLogWriter);
             _processMonitor = new ProcessMonitorService(_loggingService, () => Config, () => _sessionService.CurrentSession);
             _windowMonitor = new WindowMonitorService(OnWindowChanged);
 
