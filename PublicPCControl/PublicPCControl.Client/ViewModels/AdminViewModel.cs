@@ -9,6 +9,7 @@ using System.Windows.Data;
 using System.Windows.Input;
 using PublicPCControl.Client.Models;
 using PublicPCControl.Client.Services;
+using PublicPCControl.Client.Views;
 
 namespace PublicPCControl.Client.ViewModels
 {
@@ -29,10 +30,8 @@ namespace PublicPCControl.Client.ViewModels
         private string _programSearchText = string.Empty;
 
         public ObservableCollection<AllowedProgram> AllowedPrograms { get; } = new();
-        public ObservableCollection<ProgramSuggestion> ProgramSuggestions { get; } = new();
 
         public ICollectionView AllowedProgramsView { get; }
-        public ICollectionView ProgramSuggestionsView { get; }
 
         public bool EnforcementEnabled
         {
@@ -150,7 +149,6 @@ namespace PublicPCControl.Client.ViewModels
                 if (SetProperty(ref _programSearchText, value))
                 {
                     AllowedProgramsView.Refresh();
-                    ProgramSuggestionsView.Refresh();
                 }
             }
         }
@@ -161,8 +159,7 @@ namespace PublicPCControl.Client.ViewModels
         public ICommand CloseCommand { get; }
         public ICommand EnterMaintenanceCommand { get; }
         public ICommand ResumeFromMaintenanceCommand { get; }
-        public ICommand UseSuggestionCommand { get; }
-        public ICommand RefreshSuggestionsCommand { get; }
+        public ICommand OpenSuggestionsCommand { get; }
 
         public AdminViewModel(
             ConfigService configService,
@@ -184,15 +181,10 @@ namespace PublicPCControl.Client.ViewModels
             CloseCommand = new RelayCommand(_ => CloseWithSave());
             EnterMaintenanceCommand = new RelayCommand(_ => _enterMaintenance());
             ResumeFromMaintenanceCommand = new RelayCommand(_ => _resumeFromMaintenance(), _ => _isMaintenanceActive());
-            RefreshSuggestionsCommand = new RelayCommand(_ => LoadProgramSuggestions());
+            OpenSuggestionsCommand = new RelayCommand(_ => OpenSuggestions());
 
             AllowedProgramsView = CollectionViewSource.GetDefaultView(AllowedPrograms);
             AllowedProgramsView.Filter = FilterPrograms;
-
-            ProgramSuggestionsView = CollectionViewSource.GetDefaultView(ProgramSuggestions);
-            ProgramSuggestionsView.Filter = FilterSuggestions;
-
-            UseSuggestionCommand = new RelayCommand(p => ApplySuggestion(p as ProgramSuggestion), p => p is ProgramSuggestion);
         }
 
         public void Refresh(AppConfig config)
@@ -207,7 +199,6 @@ namespace PublicPCControl.Client.ViewModels
             }
             OnPropertyChanged(string.Empty);
             EnsureModeSelected();
-            LoadProgramSuggestions();
             HasUnsavedChanges = false;
             _isRefreshing = false;
             if (ResumeFromMaintenanceCommand is RelayCommand relay)
@@ -226,32 +217,23 @@ namespace PublicPCControl.Client.ViewModels
 
         private void AddProgram()
         {
-            if (!File.Exists(NewProgramPath))
+            if (TryAddProgram(new AllowedProgram
             {
-                MessageBox.Show("실행 파일 경로가 존재하지 않습니다.", "경로 확인", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-
-            if (AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, NewProgramPath, System.StringComparison.OrdinalIgnoreCase)))
+                DisplayName = NewProgramName,
+                ExecutablePath = NewProgramPath,
+                Arguments = NewProgramArguments
+            }, true))
             {
-                MessageBox.Show("이미 동일한 경로가 허용 목록에 있습니다.", "중복 추가", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
+                NewProgramName = string.Empty;
+                NewProgramPath = string.Empty;
+                NewProgramArguments = string.Empty;
             }
-
-            var program = new AllowedProgram { DisplayName = NewProgramName, ExecutablePath = NewProgramPath, Arguments = NewProgramArguments };
-            program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
-            AllowedPrograms.Add(program);
-            _config.AllowedPrograms = AllowedPrograms.ToList();
-            MarkDirty();
-            NewProgramName = string.Empty;
-            NewProgramPath = string.Empty;
-            NewProgramArguments = string.Empty;
         }
 
         public void Save()
         {
             _config.AllowedPrograms = AllowedPrograms.ToList();
-            if (_config.DefaultSessionMinutes <= 0)
+            if (_config.DefaultSessionMinutes < 1)
             {
                 _config.DefaultSessionMinutes = 1;
             }
@@ -284,16 +266,19 @@ namespace PublicPCControl.Client.ViewModels
             MarkDirty();
         }
 
-        private void ApplySuggestion(ProgramSuggestion? suggestion)
+        public bool ApplySuggestion(ProgramSuggestion? suggestion, bool showMessage = true)
         {
             if (suggestion == null)
             {
-                return;
+                return false;
             }
 
-            NewProgramName = suggestion.DisplayName;
-            NewProgramPath = suggestion.ExecutablePath;
-            AddProgram();
+            return TryAddProgram(new AllowedProgram
+            {
+                DisplayName = suggestion.DisplayName,
+                ExecutablePath = suggestion.ExecutablePath,
+                Arguments = string.Empty
+            }, showMessage);
         }
 
         private void RefreshProgramCommands()
@@ -304,22 +289,24 @@ namespace PublicPCControl.Client.ViewModels
             }
         }
 
-        private void LoadProgramSuggestions()
+        private void CloseWithSave()
         {
-            ProgramSuggestions.Clear();
-            try
+            if (HasUnsavedChanges)
             {
-                foreach (var suggestion in ProgramDiscoveryService.FindSuggestions())
-                {
-                    ProgramSuggestions.Add(suggestion);
-                }
-            }
-            catch (Exception ex)
-            {
-                ErrorReporter.Log("AdminView", ex);
+                Save();
             }
 
-            ProgramSuggestionsView.Refresh();
+            _close();
+        }
+
+        private void MarkDirty()
+        {
+            if (_isRefreshing)
+            {
+                return;
+            }
+
+            HasUnsavedChanges = true;
         }
 
         private void CloseWithSave()
@@ -358,21 +345,6 @@ namespace PublicPCControl.Client.ViewModels
                    || program.ExecutablePath.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase);
         }
 
-        private bool FilterSuggestions(object obj)
-        {
-            if (obj is not ProgramSuggestion suggestion)
-            {
-                return false;
-            }
-
-            if (string.IsNullOrWhiteSpace(ProgramSearchText))
-            {
-                return true;
-            }
-
-            return suggestion.DisplayName.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase);
-        }
-
         private void EnsureModeSelected()
         {
             if (!_config.EnforcementEnabled && !_config.IsAdminOnlyPc)
@@ -380,6 +352,52 @@ namespace PublicPCControl.Client.ViewModels
                 _config.EnforcementEnabled = true;
                 OnPropertyChanged(nameof(EnforcementEnabled));
             }
+        }
+
+        public bool IsAlreadyAllowed(string executablePath)
+        {
+            return AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private bool TryAddProgram(AllowedProgram program, bool showMessages)
+        {
+            if (!File.Exists(program.ExecutablePath))
+            {
+                if (showMessages)
+                {
+                    MessageBox.Show("실행 파일 경로가 존재하지 않습니다.", "경로 확인", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+
+                return false;
+            }
+
+            if (IsAlreadyAllowed(program.ExecutablePath))
+            {
+                if (showMessages)
+                {
+                    MessageBox.Show("이미 동일한 경로가 허용 목록에 있습니다.", "중복 추가", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                return false;
+            }
+
+            program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
+            AllowedPrograms.Add(program);
+            _config.AllowedPrograms = AllowedPrograms.ToList();
+            MarkDirty();
+            return true;
+        }
+
+        private void OpenSuggestions()
+        {
+            var window = new Views.ProgramSuggestionsWindow();
+            var viewModel = new ProgramSuggestionsViewModel(
+                ProgramDiscoveryService.FindSuggestions,
+                suggestion => ApplySuggestion(suggestion, true),
+                suggestion => !IsAlreadyAllowed(suggestion.ExecutablePath));
+            window.DataContext = viewModel;
+            window.Owner = Application.Current?.MainWindow;
+            window.ShowDialog();
         }
     }
 }

@@ -140,8 +140,8 @@
                             <StackPanel>
                                 <TextBlock Text="이름/경로 검색" Foreground="#9fd6ff" FontSize="12" />
                                 <Grid Width="260">
-                                    <TextBox x:Name="ProgramSearchBox" Width="260" Text="{Binding ProgramSearchText, UpdateSourceTrigger=PropertyChanged}" Background="#0d1627" Foreground="#f6fbff" BorderBrush="#36548c" BorderThickness="1.2" Padding="10" ToolTip="이름 또는 경로로 허용/추천 프로그램을 검색합니다." />
-                                    <TextBlock Text="허용/추천 목록에서 빠르게 찾기" Foreground="#5d76a5" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
+                                    <TextBox x:Name="ProgramSearchBox" Width="260" Text="{Binding ProgramSearchText, UpdateSourceTrigger=PropertyChanged}" Background="#0d1627" Foreground="#f6fbff" BorderBrush="#36548c" BorderThickness="1.2" Padding="10" ToolTip="이름 또는 경로로 허용 목록을 검색합니다." />
+                                    <TextBlock Text="허용 목록에서 빠르게 찾기" Foreground="#5d76a5" Margin="12,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
                                                 <Setter Property="Visibility" Value="Collapsed" />
@@ -155,7 +155,7 @@
                                     </TextBlock>
                                 </Grid>
                             </StackPanel>
-                            <Button Content="추천 창 열기" Padding="12,8" Background="#24375a" Foreground="#eaf1ff" Margin="8,12,0,0" Click="OnOpenSuggestions" />
+                            <Button Content="추천 프로그램 창 열기" Command="{Binding OpenSuggestionsCommand}" Padding="12,8" Background="#24375a" Foreground="#eaf1ff" Margin="10,12,0,0" />
                         </StackPanel>
                     </StackPanel>
 
@@ -251,16 +251,9 @@
                             </StackPanel>
                         </Border>
 
-                        <TextBlock Text="추천/단축 아이콘" FontWeight="SemiBold" Foreground="#e2ebff" FontSize="15" />
+                        <TextBlock Text="추천 프로그램은 별도 창에서 검색/추가할 수 있습니다." FontWeight="SemiBold" Foreground="#e2ebff" FontSize="15" />
                         <Border Background="#0e1727" BorderBrush="#233555" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,6,0,0">
-                            <StackPanel>
-                                <TextBlock Text="추천은 시작 메뉴·바탕화면의 바로가기(.lnk)를 뒤져서 실제 실행 파일이 존재하는 항목만 보여줍니다." Foreground="#9fb4dd" TextWrapping="Wrap" />
-                                <TextBlock Text="자주 쓰는 프로그램만 따로 보고 싶다면 아래 버튼으로 전용 창을 열어 추가하세요." Foreground="#9fb4dd" TextWrapping="Wrap" Margin="0,6,0,0" />
-                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                    <Button Content="추천 새로고침" Command="{Binding RefreshSuggestionsCommand}" Padding="12,8" Background="#24375a" Foreground="#eaf1ff" />
-                                    <Button Content="추천 창 열기" Margin="8,0,0,0" Padding="12,8" Background="#3a547d" Foreground="#eaf1ff" Click="OnOpenSuggestions" />
-                                </StackPanel>
-                            </StackPanel>
+                            <TextBlock Text="'추천 프로그램 창 열기' 버튼을 눌러 시작 메뉴/바탕화면/설치 경로를 스캔한 결과를 확인하고, 바로 허용 목록에 추가하세요." Foreground="#9fb4dd" TextWrapping="Wrap" />
                         </Border>
                     </StackPanel>
                 </Grid>
