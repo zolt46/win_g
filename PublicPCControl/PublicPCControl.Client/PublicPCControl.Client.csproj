@@ -6,36 +6,13 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>x86;x64</Platforms>
-    <ApplicationIcon />
-    <EnableDefaultPageItems>false</EnableDefaultPageItems>
-    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Include="**/*.cs" Exclude="bin/**;obj/**" />
-    <Compile Include="$(IntermediateOutputPath)**/*.cs" />
-
-    <ApplicationDefinition Include="App.xaml" />
-    <Page Include="MainWindow.xaml" />
-    <Page Include="Views\AdminView.xaml" />
-    <Page Include="Views\AdminPasswordWindow.xaml" />
-    <Page Include="Views\AdminPasswordChangeWindow.xaml" />
-    <Page Include="Views\AdminPasswordSetupWindow.xaml" />
-    <Page Include="Views\ConsentDetailsWindow.xaml" />
-    <Page Include="Views\AdminMaintenanceWindow.xaml" />
-    <Page Include="Views\ProgramSuggestionsWindow.xaml" />
-    <Page Include="Views\LockScreenView.xaml" />
-    <Page Include="Views\SessionView.xaml" />
-    <Page Include="Views\UserLoginView.xaml" />
-    <Page Include="Views\ProgramSuggestionsWindow.xaml" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.7" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
   </ItemGroup>
-
 </Project>
