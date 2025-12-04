@@ -312,7 +312,8 @@ namespace PublicPCControl.Client.ViewModels
             HasUnsavedChanges = true;
         }
 
-        private void MarkDirty()
+
+        private bool FilterPrograms(object obj)
         {
             var program = obj as AllowedProgram;
             if (program == null)
@@ -361,18 +362,6 @@ namespace PublicPCControl.Client.ViewModels
             return true;
         }
 
-        private void OpenSuggestions()
-        {
-            var window = new Views.ProgramSuggestionsWindow();
-            var viewModel = new ProgramSuggestionsViewModel(
-                ProgramDiscoveryService.FindSuggestions,
-                suggestion => ApplySuggestion(suggestion, true),
-                suggestion => !IsAlreadyAllowed(suggestion.ExecutablePath));
-            window.DataContext = viewModel;
-            window.Owner = Application.Current?.MainWindow;
-            window.ShowDialog();
-        }
-
             return false;
         }
 
@@ -410,6 +399,7 @@ namespace PublicPCControl.Client.ViewModels
             {
                 program.Icon = IconHelper.LoadIcon(program.ExecutablePath);
             }
+
             AllowedPrograms.Add(program);
             _config.AllowedPrograms = AllowedPrograms.ToList();
             MarkDirty();
