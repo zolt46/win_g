@@ -29,7 +29,7 @@ namespace PublicPCControl.Client.ViewModels
         private string _newProgramArguments = string.Empty;
         private string _programSearchText = string.Empty;
 
-        public ObservableCollection<AllowedProgram> AllowedPrograms { get; } = new ObservableCollection<AllowedProgram>();
+        public ObservableCollection<AllowedProgram> AllowedPrograms { get; }
 
         public ICollectionView AllowedProgramsView { get; }
 
@@ -175,6 +175,7 @@ namespace PublicPCControl.Client.ViewModels
             _enterMaintenance = enterMaintenance;
             _resumeFromMaintenance = resumeFromMaintenance;
             _isMaintenanceActive = isMaintenanceActive;
+            AllowedPrograms = new ObservableCollection<AllowedProgram>();
             AddProgramCommand = new RelayCommand(_ => AddProgram(), _ => !string.IsNullOrWhiteSpace(NewProgramName) && !string.IsNullOrWhiteSpace(NewProgramPath));
             RemoveProgramCommand = new RelayCommand(p => RemoveProgram(p as AllowedProgram), p => p is AllowedProgram);
             SaveCommand = new RelayCommand(_ => Save());

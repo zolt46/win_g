@@ -1242,6 +1242,105 @@ namespace PublicPCControl.Client.ViewModels
             SetForegroundWindow(handle);
         }
 
+        private static IntPtr WaitForMainWindow(Process? process)
+        {
+            if (process == null)
+            {
+                return IntPtr.Zero;
+            }
+
+            for (var i = 0; i < 5; i++)
+            {
+                try
+                {
+                    if (process.HasExited)
+                    {
+                        break;
+                    }
+
+                    process.WaitForInputIdle(1000);
+                    process.Refresh();
+                    if (process.MainWindowHandle != IntPtr.Zero)
+                    {
+                        return process.MainWindowHandle;
+                    }
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                System.Threading.Thread.Sleep(150);
+            }
+
+            return IntPtr.Zero;
+        }
+
+        private static IntPtr FindExistingWindow(string executablePath)
+        {
+            if (string.IsNullOrWhiteSpace(executablePath))
+            {
+                return IntPtr.Zero;
+            }
+
+            var processName = Path.GetFileNameWithoutExtension(executablePath);
+            foreach (var proc in Process.GetProcessesByName(processName))
+            {
+                try
+                {
+                    var path = proc.MainModule?.FileName;
+                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
+                    {
+                        continue;
+                    }
+
+                    proc.Refresh();
+                    if (proc.MainWindowHandle != IntPtr.Zero)
+                    {
+                        return proc.MainWindowHandle;
+                    }
+
+                    var fallback = FindVisibleWindowHandle(proc.Id);
+                    if (fallback != IntPtr.Zero)
+                    {
+                        return fallback;
+                    }
+                }
+                catch
+                {
+                    // ignore processes we cannot inspect
+                }
+            }
+
+            return IntPtr.Zero;
+        }
+
+        private static IntPtr FindVisibleWindowHandle(int processId)
+        {
+            IntPtr found = IntPtr.Zero;
+            EnumWindows((hWnd, _) =>
+            {
+                GetWindowThreadProcessId(hWnd, out var pid);
+                if (pid != processId || !IsWindowVisible(hWnd))
+                {
+                    return true;
+                }
+
+                found = hWnd;
+                return false;
+            }, IntPtr.Zero);
+
+            return found;
+        }
+
+        private static void ActivateHandle(IntPtr handle)
+        {
+            ShowWindow(handle, SwRestore);
+            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
+            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
+            SetForegroundWindow(handle);
+        }
+
         [DllImport("user32.dll")]
         private static extern bool SetForegroundWindow(IntPtr hWnd);
 
