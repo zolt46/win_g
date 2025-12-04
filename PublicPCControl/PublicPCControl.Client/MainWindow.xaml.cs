@@ -1,4 +1,5 @@
 // File: PublicPCControl.Client/MainWindow.xaml.cs
+using System;
 using System.Windows;
 
 namespace PublicPCControl.Client
@@ -13,6 +14,7 @@ namespace PublicPCControl.Client
             _viewModel = viewModel;
             DataContext = _viewModel;
             PreviewKeyDown += OnPreviewKeyDown;
+            Loaded += (_, _) => ApplyScale();
         }
 
         private void OnPreviewKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
@@ -29,6 +31,26 @@ namespace PublicPCControl.Client
         private void TriggerAdmin()
         {
             _viewModel.HandleAdminShortcut();
+        }
+
+        private void OnWindowSizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            ApplyScale();
+        }
+
+        private void ApplyScale()
+        {
+            const double baseWidth = 1600.0;
+            const double baseHeight = 900.0;
+
+            if (ActualWidth <= 0 || ActualHeight <= 0)
+            {
+                return;
+            }
+
+            var scale = Math.Min(ActualWidth / baseWidth, ActualHeight / baseHeight);
+            RootScale.ScaleX = scale;
+            RootScale.ScaleY = scale;
         }
     }
 }
