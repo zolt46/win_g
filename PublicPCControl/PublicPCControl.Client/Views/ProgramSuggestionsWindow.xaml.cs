@@ -11,12 +11,6 @@ namespace PublicPCControl.Client.Views
             InitializeComponent();
         }
 
-        public void InitializeComponent()
-        {
-            var resourceLocater = new Uri("/PublicPCControl.Client;component/Views/ProgramSuggestionsWindow.xaml", UriKind.Relative);
-            Application.LoadComponent(this, resourceLocater);
-        }
-
         private void OnClose(object sender, RoutedEventArgs e)
         {
             Close();
