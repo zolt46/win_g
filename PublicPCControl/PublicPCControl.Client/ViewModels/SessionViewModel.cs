@@ -175,6 +175,7 @@ namespace PublicPCControl.Client.ViewModels
             var mainHandle = GetWindowHandle(mainWindow);
             try
             {
+                SetMainWindowTopmostState(mainWindow, mainHandle, false);
                 var process = Process.Start(new ProcessStartInfo
                 {
                     FileName = program.ExecutablePath,
@@ -188,12 +189,12 @@ namespace PublicPCControl.Client.ViewModels
                 if (process == null)
                 {
                     BringToFront(program.ExecutablePath, null);
-                    MaintainMainWindowTopmost(mainWindow, mainHandle);
+                    SetMainWindowTopmostState(mainWindow, mainHandle, true);
                     return;
                 }
 
                 process.EnableRaisingEvents = true;
-                process.Exited += (_, _) => MaintainMainWindowTopmost(mainWindow, mainHandle);
+                process.Exited += (_, _) => SetMainWindowTopmostState(mainWindow, mainHandle, true);
 
                 BringToFront(program.ExecutablePath, process);
                 MaintainMainWindowTopmost(mainWindow, mainHandle);
@@ -202,7 +203,7 @@ namespace PublicPCControl.Client.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                MaintainMainWindowTopmost(mainWindow, mainHandle);
+                SetMainWindowTopmostState(mainWindow, mainHandle, true);
             }
         }
 
@@ -217,14 +218,15 @@ namespace PublicPCControl.Client.ViewModels
             });
         }
 
-        private static void MaintainMainWindowTopmost(Window? window, IntPtr handle)
+        private static void SetMainWindowTopmostState(Window? window, IntPtr handle, bool makeTopmost)
         {
             if (window == null || handle == IntPtr.Zero) return;
 
             window.Dispatcher.BeginInvoke(() =>
             {
-                window.Topmost = true;
-                SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoActivate);
+                window.Topmost = makeTopmost;
+                var insertAfter = makeTopmost ? HwndTopmost : HwndNoTopmost;
+                SetWindowPos(handle, insertAfter, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoActivate);
             });
         }
 
