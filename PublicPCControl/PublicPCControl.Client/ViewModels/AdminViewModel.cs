@@ -312,21 +312,29 @@ namespace PublicPCControl.Client.ViewModels
             HasUnsavedChanges = true;
         }
 
-        private bool FilterPrograms(object obj)
+        private void MarkDirty()
         {
             var program = obj as AllowedProgram;
             if (program == null)
             {
-                return false;
+                return;
             }
 
-            if (string.IsNullOrWhiteSpace(ProgramSearchText))
+            HasUnsavedChanges = true;
+        }
+
+        private void EnsureModeSelected()
+        {
+            if (!_config.EnforcementEnabled && !_config.IsAdminOnlyPc)
             {
-                return true;
+                _config.EnforcementEnabled = true;
+                OnPropertyChanged(nameof(EnforcementEnabled));
             }
+        }
 
-            return program.DisplayName.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase)
-                   || program.ExecutablePath.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase);
+        public bool IsAlreadyAllowed(string executablePath)
+        {
+            return AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase));
         }
 
         private void EnsureModeSelected()
@@ -354,6 +362,7 @@ namespace PublicPCControl.Client.ViewModels
 
                 return false;
             }
+        }
 
             if (IsAlreadyAllowed(program.ExecutablePath))
             {
@@ -364,6 +373,11 @@ namespace PublicPCControl.Client.ViewModels
 
                 return false;
             }
+            AllowedPrograms.Add(program);
+            _config.AllowedPrograms = AllowedPrograms.ToList();
+            MarkDirty();
+            return true;
+        }
 
             if (program.Icon == null)
             {
