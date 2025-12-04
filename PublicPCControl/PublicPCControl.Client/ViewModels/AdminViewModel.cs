@@ -313,16 +313,20 @@ namespace PublicPCControl.Client.ViewModels
             HasUnsavedChanges = true;
         }
 
-
         private bool FilterPrograms(object obj)
         {
-            var program = obj as AllowedProgram;
-            if (program == null)
+            if (obj is not AllowedProgram program)
             {
-                return;
+                return false;
             }
 
-            HasUnsavedChanges = true;
+            if (string.IsNullOrWhiteSpace(ProgramSearchText))
+            {
+                return true;
+            }
+
+            return program.DisplayName.Contains(ProgramSearchText, StringComparison.OrdinalIgnoreCase)
+                   || program.ExecutablePath.Contains(ProgramSearchText, StringComparison.OrdinalIgnoreCase);
         }
 
         private void EnsureModeSelected()
@@ -337,33 +341,6 @@ namespace PublicPCControl.Client.ViewModels
         public bool IsAlreadyAllowed(string executablePath)
         {
             return AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase));
-        }
-
-        private void EnsureModeSelected()
-        {
-            if (!_config.EnforcementEnabled && !_config.IsAdminOnlyPc)
-            {
-                _config.EnforcementEnabled = true;
-                OnPropertyChanged(nameof(EnforcementEnabled));
-            }
-        }
-
-        public bool IsAlreadyAllowed(string executablePath)
-        {
-            foreach (var program in AllowedPrograms)
-            {
-                if (string.Equals(program.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            AllowedPrograms.Add(program);
-            _config.AllowedPrograms = AllowedPrograms.ToList();
-            MarkDirty();
-            return true;
-        }
-
-            return false;
         }
 
         private bool TryAddProgram(AllowedProgram program, bool showMessages)
@@ -396,11 +373,7 @@ namespace PublicPCControl.Client.ViewModels
                 return false;
             }
 
-            if (program.Icon == null)
-            {
-                program.Icon = IconHelper.LoadIcon(program.ExecutablePath);
-            }
-
+            program.Icon ??= IconHelper.LoadIcon(program.ExecutablePath);
             AllowedPrograms.Add(program);
             _config.AllowedPrograms = AllowedPrograms.ToList();
             MarkDirty();
