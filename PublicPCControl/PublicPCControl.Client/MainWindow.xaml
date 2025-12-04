@@ -4,8 +4,12 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Public PC Control" WindowStyle="None" WindowState="Maximized"
         Topmost="True" ResizeMode="NoResize" Background="#111"
-        ShowInTaskbar="True">
-    <Grid>
+        ShowInTaskbar="True"
+        SizeChanged="OnWindowSizeChanged">
+    <Grid x:Name="RootLayout">
+        <Grid.LayoutTransform>
+            <ScaleTransform x:Name="RootScale" />
+        </Grid.LayoutTransform>
         <ContentControl Content="{Binding CurrentViewModel}" />
 
         <!-- 기본 뷰 모델이 null이거나 DataTemplate 매칭이 실패했을 때 안내 오버레이 -->
