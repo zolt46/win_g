@@ -312,21 +312,15 @@ namespace PublicPCControl.Client.ViewModels
             HasUnsavedChanges = true;
         }
 
-        private bool FilterPrograms(object obj)
+        private void MarkDirty()
         {
             var program = obj as AllowedProgram;
             if (program == null)
             {
-                return false;
+                return;
             }
 
-            if (string.IsNullOrWhiteSpace(ProgramSearchText))
-            {
-                return true;
-            }
-
-            return program.DisplayName.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase)
-                   || program.ExecutablePath.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase);
+            HasUnsavedChanges = true;
         }
 
         private void EnsureModeSelected()
@@ -372,6 +366,62 @@ namespace PublicPCControl.Client.ViewModels
 
                 return false;
             }
+        }
+
+            if (program.Icon == null)
+            {
+                program.Icon = IconHelper.LoadIcon(program.ExecutablePath);
+            }
+            AllowedPrograms.Add(program);
+            _config.AllowedPrograms = AllowedPrograms.ToList();
+            MarkDirty();
+            return true;
+        }
+
+        private void OpenSuggestions()
+        {
+            var window = new Views.ProgramSuggestionsWindow();
+            var viewModel = new ProgramSuggestionsViewModel(
+                ProgramDiscoveryService.FindSuggestions,
+                suggestion => ApplySuggestion(suggestion, true),
+                suggestion => !IsAlreadyAllowed(suggestion.ExecutablePath));
+            window.DataContext = viewModel;
+            window.Owner = Application.Current?.MainWindow;
+            window.ShowDialog();
+        }
+
+        public bool IsAlreadyAllowed(string executablePath)
+        {
+            return AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private bool TryAddProgram(AllowedProgram program, bool showMessages)
+        {
+            if (!File.Exists(program.ExecutablePath))
+            {
+                if (showMessages)
+                {
+                    MessageBox.Show("실행 파일 경로가 존재하지 않습니다.", "경로 확인", MessageBoxButton.OK, MessageBoxImage.Warning);
+                }
+
+                return false;
+            }
+        }
+
+            if (IsAlreadyAllowed(program.ExecutablePath))
+            {
+                if (showMessages)
+                {
+                    MessageBox.Show("이미 동일한 경로가 허용 목록에 있습니다.", "중복 추가", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+
+                return false;
+            }
+            AllowedPrograms.Add(program);
+            _config.AllowedPrograms = AllowedPrograms.ToList();
+            MarkDirty();
+            return true;
+        }
 
             if (program.Icon == null)
             {
