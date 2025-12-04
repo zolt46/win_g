@@ -197,6 +197,7 @@ namespace PublicPCControl.Client.ViewModels
                 process.Exited += (_, _) => SetMainWindowTopmostState(mainWindow, mainHandle, true);
 
                 BringToFront(program.ExecutablePath, process);
+                MaintainMainWindowTopmost(mainWindow, mainHandle);
                 _loggingService.LogProcessStart(CurrentSession.Id, program.DisplayName, program.ExecutablePath);
             }
             catch (Exception ex)
