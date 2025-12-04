@@ -1,0 +1,79 @@
+<!-- File: PublicPCControl.Client/Views/ProgramSuggestionsWindow.xaml -->
+<Window x:Class="PublicPCControl.Client.Views.ProgramSuggestionsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="추천 프로그램"
+        Height="640"
+        Width="860"
+        WindowStartupLocation="CenterOwner"
+        Background="#0c111c">
+    <Border Padding="18" Background="#0f1728" BorderBrush="#1d2a42" BorderThickness="1" CornerRadius="14">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBlock Text="추천 프로그램" Foreground="#eff4ff" FontSize="22" FontWeight="Bold" />
+                    <TextBlock Text="설치된 앱을 스캔해 추천합니다. 목록에서 바로 허용 목록으로 추가하세요." Foreground="#9fb4dd" Margin="0,4,0,0" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBox Width="240"
+                             Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                             Background="#0d1627" Foreground="#f6fbff" BorderBrush="#36548c" BorderThickness="1.2" Padding="10"
+                             ToolTip="이름 또는 경로로 검색" />
+                    <Button Content="추천 새로고침" Command="{Binding RefreshCommand}" Padding="14,8" Margin="10,0,0,0"
+                            Background="#24375a" Foreground="#eaf1ff" />
+                </StackPanel>
+            </Grid>
+
+            <Border Grid.Row="1" Background="#0e1727" BorderBrush="#1d2c45" BorderThickness="1" CornerRadius="12" Padding="12" Margin="0,12,0,12">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding SuggestionsView}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#101a2d" CornerRadius="10" Padding="10" Margin="0,0,0,10" BorderBrush="#233555" BorderThickness="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Image Source="{Binding Icon}" Width="32" Height="32" Margin="0,0,12,0" />
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#f6fbff" FontWeight="SemiBold" />
+                                            <TextBlock Text="{Binding ExecutablePath}" Foreground="#b7c8f1" FontSize="12" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding Source}" Foreground="#9fd6ff" FontSize="12" />
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Content="추가" Command="{Binding DataContext.UseSuggestionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}" Padding="12,8" Background="#3a547d" Foreground="#eaf1ff" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Border>
+
+            <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <TextBlock Text="추천 목록은 설치된 앱과 바로가기에서 확장해 수집합니다." Foreground="#9fb4dd" Margin="0,0,12,0" />
+                <Button Content="닫기" Width="90" Padding="12,8" Click="OnClose" Background="#1f2a3d" Foreground="#dfe8ff" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>
