@@ -7,7 +7,7 @@ namespace PublicPCControl.Client.Services
 {
     public static class ErrorReporter
     {
-        private static readonly object _sync = new();
+        private static readonly object _sync = new object();
         private static readonly string _logPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "error.log");
 
         public static void Log(string source, Exception exception)
