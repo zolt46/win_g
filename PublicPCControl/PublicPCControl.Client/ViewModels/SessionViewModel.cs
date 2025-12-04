@@ -6,6 +6,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using System.Windows;
 using PublicPCControl.Client.Models;
@@ -171,7 +172,7 @@ namespace PublicPCControl.Client.ViewModels
         {
             if (program == null || CurrentSession == null) return;
             var mainWindow = Application.Current?.MainWindow;
-            ReleaseTopmost(mainWindow);
+            var mainHandle = GetWindowHandle(mainWindow);
             try
             {
                 var process = Process.Start(new ProcessStartInfo
@@ -187,45 +188,43 @@ namespace PublicPCControl.Client.ViewModels
                 if (process == null)
                 {
                     BringToFront(program.ExecutablePath, null);
-                    RestoreTopmost(mainWindow);
+                    MaintainMainWindowTopmost(mainWindow, mainHandle);
                     return;
                 }
 
                 process.EnableRaisingEvents = true;
-                process.Exited += (_, _) => RestoreTopmost(mainWindow);
+                process.Exited += (_, _) => MaintainMainWindowTopmost(mainWindow, mainHandle);
 
                 BringToFront(program.ExecutablePath, process);
+                MaintainMainWindowTopmost(mainWindow, mainHandle);
                 _loggingService.LogProcessStart(CurrentSession.Id, program.DisplayName, program.ExecutablePath);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                RestoreTopmost(mainWindow);
+                MaintainMainWindowTopmost(mainWindow, mainHandle);
             }
         }
 
-        private static void ReleaseTopmost(Window? window)
+        private static IntPtr GetWindowHandle(Window? window)
         {
-            if (window == null)
-            {
-                return;
-            }
+            if (window == null) return IntPtr.Zero;
 
-            window.Dispatcher.Invoke(() => window.Topmost = false);
+            return window.Dispatcher.Invoke(() =>
+            {
+                var helper = new WindowInteropHelper(window);
+                return helper.Handle;
+            });
         }
 
-        private static void RestoreTopmost(Window? window)
+        private static void MaintainMainWindowTopmost(Window? window, IntPtr handle)
         {
-            if (window == null)
-            {
-                return;
-            }
+            if (window == null || handle == IntPtr.Zero) return;
 
-            window.Dispatcher.Invoke(() =>
+            window.Dispatcher.BeginInvoke(() =>
             {
                 window.Topmost = true;
-                window.Activate();
-                window.Focus();
+                SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoActivate);
             });
         }
 
@@ -241,6 +240,7 @@ namespace PublicPCControl.Client.ViewModels
 
                 if (handle != IntPtr.Zero)
                 {
+                    SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
                     ActivateHandle(handle);
                 }
             }
@@ -375,5 +375,6 @@ namespace PublicPCControl.Client.ViewModels
         private const uint SwpNoMove = 0x0002;
         private const uint SwpNoSize = 0x0001;
         private const uint SwpShowWindow = 0x0040;
+        private const uint SwpNoActivate = 0x0010;
     }
 }
