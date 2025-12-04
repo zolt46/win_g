@@ -309,6 +309,26 @@ namespace PublicPCControl.Client.ViewModels
             HasUnsavedChanges = true;
         }
 
+        private void CloseWithSave()
+        {
+            if (HasUnsavedChanges)
+            {
+                Save();
+            }
+
+            _close();
+        }
+
+        private void MarkDirty()
+        {
+            if (_isRefreshing)
+            {
+                return;
+            }
+
+            HasUnsavedChanges = true;
+        }
+
         private bool FilterPrograms(object obj)
         {
             if (obj is not AllowedProgram program)

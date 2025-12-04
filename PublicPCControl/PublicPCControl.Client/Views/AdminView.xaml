@@ -135,6 +135,7 @@
                     <StackPanel Grid.Row="0" Grid.ColumnSpan="2" Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="허용 프로그램" FontWeight="Bold" FontSize="18" />
                         <TextBlock Text="추가/삭제 후 저장하면 바로 반영됩니다." Foreground="#b7c8f1" Margin="8,2,0,0" />
+                        <TextBlock Text="추천 기준: 시작 메뉴/바탕화면 바로가기(.lnk)에서 확인된 실행 파일" Foreground="#9fd6ff" Margin="14,2,0,0" FontSize="12" />
                         <StackPanel Orientation="Horizontal" Margin="16,0,0,0" VerticalAlignment="Center">
                             <StackPanel>
                                 <TextBlock Text="이름/경로 검색" Foreground="#9fd6ff" FontSize="12" />

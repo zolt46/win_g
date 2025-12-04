@@ -175,9 +175,10 @@ namespace PublicPCControl.Client.ViewModels
                 {
                     FileName = program.ExecutablePath,
                     Arguments = program.Arguments,
-                    UseShellExecute = false,
+                    UseShellExecute = true,
                     WorkingDirectory = System.IO.Path.GetDirectoryName(program.ExecutablePath) ?? string.Empty,
-                    WindowStyle = ProcessWindowStyle.Normal
+                    WindowStyle = ProcessWindowStyle.Normal,
+                    Verb = "open"
                 });
 
                 if (process == null)
@@ -244,6 +245,8 @@ namespace PublicPCControl.Client.ViewModels
             {
                 // ignored
             }
+
+            return IntPtr.Zero;
         }
 
         private static IntPtr WaitForMainWindow(Process? process)
