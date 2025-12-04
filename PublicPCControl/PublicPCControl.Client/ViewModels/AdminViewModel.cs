@@ -312,21 +312,29 @@ namespace PublicPCControl.Client.ViewModels
             HasUnsavedChanges = true;
         }
 
-        private bool FilterPrograms(object obj)
+        private void MarkDirty()
         {
             var program = obj as AllowedProgram;
             if (program == null)
             {
-                return false;
+                return;
             }
 
-            if (string.IsNullOrWhiteSpace(ProgramSearchText))
+            HasUnsavedChanges = true;
+        }
+
+        private void EnsureModeSelected()
+        {
+            if (!_config.EnforcementEnabled && !_config.IsAdminOnlyPc)
             {
-                return true;
+                _config.EnforcementEnabled = true;
+                OnPropertyChanged(nameof(EnforcementEnabled));
             }
+        }
 
-            return program.DisplayName.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase)
-                   || program.ExecutablePath.Contains(ProgramSearchText, System.StringComparison.OrdinalIgnoreCase);
+        public bool IsAlreadyAllowed(string executablePath)
+        {
+            return AllowedPrograms.Any(p => string.Equals(p.ExecutablePath, executablePath, StringComparison.OrdinalIgnoreCase));
         }
 
         private void EnsureModeSelected()
@@ -347,6 +355,23 @@ namespace PublicPCControl.Client.ViewModels
                     return true;
                 }
             }
+            AllowedPrograms.Add(program);
+            _config.AllowedPrograms = AllowedPrograms.ToList();
+            MarkDirty();
+            return true;
+        }
+
+        private void OpenSuggestions()
+        {
+            var window = new Views.ProgramSuggestionsWindow();
+            var viewModel = new ProgramSuggestionsViewModel(
+                ProgramDiscoveryService.FindSuggestions,
+                suggestion => ApplySuggestion(suggestion, true),
+                suggestion => !IsAlreadyAllowed(suggestion.ExecutablePath));
+            window.DataContext = viewModel;
+            window.Owner = Application.Current?.MainWindow;
+            window.ShowDialog();
+        }
 
             return false;
         }
