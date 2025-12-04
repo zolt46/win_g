@@ -12,7 +12,7 @@ namespace PublicPCControl.Client.ViewModels
         private readonly Func<bool> _getMaintenanceState;
         private readonly Action _navigateToLogin;
         private readonly Action _requestAdmin;
-        private readonly DispatcherTimer _clockTimer = new() { Interval = TimeSpan.FromSeconds(1) };
+        private readonly DispatcherTimer _clockTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         private DateTime _currentTime = DateTime.Now;
 
         public ICommand StartCommand { get; }

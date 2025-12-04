@@ -38,6 +38,23 @@ namespace PublicPCControl.Client.Services
                     Icon = IconHelper.LoadIcon(target)
                 };
             }
+
+            foreach (var installed in EnumerateInstalledExecutables())
+            {
+                if (!seen.Add(installed))
+                {
+                    continue;
+                }
+
+                var name = Path.GetFileNameWithoutExtension(installed);
+                yield return new ProgramSuggestion
+                {
+                    DisplayName = name,
+                    ExecutablePath = installed,
+                    Source = "설치된 프로그램",
+                    Icon = IconHelper.LoadIcon(installed)
+                };
+            }
         }
 
         private static IEnumerable<string> EnumerateShortcutFiles()
@@ -64,14 +81,36 @@ namespace PublicPCControl.Client.Services
             }
         }
 
-        private static IEnumerable<string> SafeEnumerateFiles(string root, string pattern)
+        private static IEnumerable<string> EnumerateInstalledExecutables()
         {
-            var stack = new Stack<string>();
-            stack.Push(root);
+            var roots = new[]
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86)
+            };
+
+            foreach (var root in roots)
+            {
+                if (string.IsNullOrWhiteSpace(root) || !Directory.Exists(root))
+                {
+                    continue;
+                }
+
+                foreach (var exe in SafeEnumerateFiles(root, "*.exe", maxDepth: 3))
+                {
+                    yield return exe;
+                }
+            }
+        }
+
+        private static IEnumerable<string> SafeEnumerateFiles(string root, string pattern, int maxDepth = int.MaxValue)
+        {
+            var stack = new Stack<(string path, int depth)>();
+            stack.Push((root, 0));
 
             while (stack.Count > 0)
             {
-                var current = stack.Pop();
+                var (current, depth) = stack.Pop();
                 IEnumerable<string> files;
 
                 try
@@ -92,6 +131,11 @@ namespace PublicPCControl.Client.Services
                     yield return file;
                 }
 
+                if (depth >= maxDepth)
+                {
+                    continue;
+                }
+
                 IEnumerable<string> children;
                 try
                 {
@@ -108,7 +152,7 @@ namespace PublicPCControl.Client.Services
 
                 foreach (var child in children)
                 {
-                    stack.Push(child);
+                    stack.Push((child, depth + 1));
                 }
             }
         }
