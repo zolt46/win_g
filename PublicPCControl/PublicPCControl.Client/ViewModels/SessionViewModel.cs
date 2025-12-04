@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Threading;
@@ -176,6 +177,7 @@ namespace PublicPCControl.Client.ViewModels
             try
             {
                 SetMainWindowTopmostState(mainWindow, mainHandle, false);
+                MaintainMainWindowTopmost(mainWindow, mainHandle, false, TimeSpan.FromSeconds(5));
                 var process = Process.Start(new ProcessStartInfo
                 {
                     FileName = program.ExecutablePath,
@@ -194,7 +196,11 @@ namespace PublicPCControl.Client.ViewModels
                 }
 
                 process.EnableRaisingEvents = true;
-                process.Exited += (_, _) => SetMainWindowTopmostState(mainWindow, mainHandle, true);
+                process.Exited += (_, _) =>
+                {
+                    SetMainWindowTopmostState(mainWindow, mainHandle, true);
+                    MaintainMainWindowTopmost(mainWindow, mainHandle, true, TimeSpan.FromSeconds(5));
+                };
 
                 BringToFront(program.ExecutablePath, process);
                 MaintainMainWindowTopmost(mainWindow, mainHandle);
@@ -227,6 +233,34 @@ namespace PublicPCControl.Client.ViewModels
                 window.Topmost = makeTopmost;
                 var insertAfter = makeTopmost ? HwndTopmost : HwndNoTopmost;
                 SetWindowPos(handle, insertAfter, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoActivate);
+            });
+        }
+
+        private static void MaintainMainWindowTopmost(Window? window, IntPtr handle, bool makeTopmost, TimeSpan duration)
+        {
+            if (window == null || handle == IntPtr.Zero) return;
+
+            _ = Task.Run(async () =>
+            {
+                var until = DateTime.UtcNow + duration;
+                while (DateTime.UtcNow < until)
+                {
+                    try
+                    {
+                        window.Dispatcher.Invoke(() =>
+                        {
+                            window.Topmost = makeTopmost;
+                            var insertAfter = makeTopmost ? HwndTopmost : HwndNoTopmost;
+                            SetWindowPos(handle, insertAfter, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoActivate);
+                        });
+                    }
+                    catch
+                    {
+                        // ignore transient dispatcher failures
+                    }
+
+                    await Task.Delay(500);
+                }
             });
         }
 

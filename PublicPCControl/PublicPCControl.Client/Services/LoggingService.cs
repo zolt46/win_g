@@ -27,7 +27,7 @@ namespace PublicPCControl.Client.Services
                 EndReason = "running"
             });
 
-            _auditLogWriter.WriteLine("PROCESS_START", $"session={sessionId}, name={name}, path={path}");
+            _auditLogWriter.WriteLine(sessionId, "PROCESS_START", $"name={name}, path={path}");
         }
 
         public void LogProcessEnd(int sessionId, string name, string path, string reason)
@@ -42,7 +42,7 @@ namespace PublicPCControl.Client.Services
                 EndReason = reason
             });
 
-            _auditLogWriter.WriteLine("PROCESS_END", $"session={sessionId}, name={name}, path={path}, reason={reason}");
+            _auditLogWriter.WriteLine(sessionId, "PROCESS_END", $"name={name}, path={path}, reason={reason}");
         }
 
         public void LogWindowChange(int sessionId, string process, string title)
@@ -55,7 +55,7 @@ namespace PublicPCControl.Client.Services
                 ChangedAt = DateTime.Now
             });
 
-            _auditLogWriter.WriteLine("WINDOW", $"session={sessionId}, process={process}, title={title}");
+            _auditLogWriter.WriteLine(sessionId, "WINDOW", $"process={process}, title={title}");
         }
     }
 }

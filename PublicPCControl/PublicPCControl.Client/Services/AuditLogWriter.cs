@@ -17,14 +17,37 @@ namespace PublicPCControl.Client.Services
             Directory.CreateDirectory(_logDirectory);
         }
 
-        public void WriteLine(string category, string message)
+        public void WriteLine(int sessionId, string category, string message)
         {
-            var line = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss}\t[{category}] {message}";
-            var path = Path.Combine(_logDirectory, $"audit-{DateTime.Now:yyyyMMdd}.log");
+            var path = Path.Combine(_logDirectory, $"audit-{DateTime.Now:yyyyMMdd}.csv");
+            var line = string.Join(',',
+                DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
+                Escape(category),
+                sessionId,
+                Escape(message));
             lock (_sync)
             {
+                EnsureHeader(path);
                 File.AppendAllText(path, line + Environment.NewLine);
             }
+        }
+
+        private static void EnsureHeader(string path)
+        {
+            if (!File.Exists(path))
+            {
+                File.AppendAllText(path, "timestamp,category,sessionId,message" + Environment.NewLine);
+            }
+        }
+
+        private static string Escape(string value)
+        {
+            if (value.Contains('"') || value.Contains(',') || value.Contains('\n'))
+            {
+                return $"\"{value.Replace("\"", "\"\"")}\"";
+            }
+
+            return value;
         }
 
         private static string GetDefaultDirectory()
