@@ -5,7 +5,9 @@ using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Interop;
 using System.Windows.Threading;
 using System.Windows;
 using PublicPCControl.Client.Models;
@@ -171,9 +173,11 @@ namespace PublicPCControl.Client.ViewModels
         {
             if (program == null || CurrentSession == null) return;
             var mainWindow = Application.Current?.MainWindow;
-            ReleaseTopmost(mainWindow);
+            var mainHandle = GetWindowHandle(mainWindow);
             try
             {
+                SetMainWindowTopmostState(mainWindow, mainHandle, false);
+                MaintainMainWindowTopmost(mainWindow, mainHandle, false, TimeSpan.FromSeconds(5));
                 var process = Process.Start(new ProcessStartInfo
                 {
                     FileName = program.ExecutablePath,
@@ -187,12 +191,16 @@ namespace PublicPCControl.Client.ViewModels
                 if (process == null)
                 {
                     BringToFront(program.ExecutablePath, null);
-                    RestoreTopmost(mainWindow);
+                    SetMainWindowTopmostState(mainWindow, mainHandle, true);
                     return;
                 }
 
                 process.EnableRaisingEvents = true;
-                process.Exited += (_, _) => RestoreTopmost(mainWindow);
+                process.Exited += (_, _) =>
+                {
+                    SetMainWindowTopmostState(mainWindow, mainHandle, true);
+                    MaintainMainWindowTopmost(mainWindow, mainHandle, true, TimeSpan.FromSeconds(5));
+                };
 
                 BringToFront(program.ExecutablePath, process);
                 _loggingService.LogProcessStart(CurrentSession.Id, program.DisplayName, program.ExecutablePath);
@@ -200,33 +208,69 @@ namespace PublicPCControl.Client.ViewModels
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                RestoreTopmost(mainWindow);
+                SetMainWindowTopmostState(mainWindow, mainHandle, true);
             }
         }
 
-        private static void ReleaseTopmost(Window? window)
+        private static IntPtr GetWindowHandle(Window? window)
         {
-            if (window == null)
-            {
-                return;
-            }
+            if (window == null) return IntPtr.Zero;
 
-            window.Dispatcher.Invoke(() => window.Topmost = false);
-        }
-
-        private static void RestoreTopmost(Window? window)
-        {
-            if (window == null)
+            return window.Dispatcher.Invoke(() =>
             {
-                return;
-            }
-
-            window.Dispatcher.Invoke(() =>
-            {
-                window.Topmost = true;
-                window.Activate();
-                window.Focus();
+                var helper = new WindowInteropHelper(window);
+                return helper.Handle;
             });
+        }
+
+        private static void SetMainWindowTopmostState(Window? window, IntPtr handle, bool makeTopmost)
+        {
+            if (window == null || handle == IntPtr.Zero) return;
+
+            window.Dispatcher.BeginInvoke(() =>
+            {
+                window.Topmost = makeTopmost;
+                var insertAfter = makeTopmost ? HwndTopmost : HwndNoTopmost;
+                SetWindowPos(handle, insertAfter, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoActivate);
+            });
+        }
+
+        private static void MaintainMainWindowTopmost(Window? window, IntPtr handle, bool makeTopmost, TimeSpan duration)
+        {
+            if (window == null || handle == IntPtr.Zero) return;
+
+            _ = Task.Run(async () =>
+            {
+                var until = DateTime.UtcNow + duration;
+                while (DateTime.UtcNow < until)
+                {
+                    try
+                    {
+                        window.Dispatcher.Invoke(() =>
+                        {
+                            window.Topmost = makeTopmost;
+                            var insertAfter = makeTopmost ? HwndTopmost : HwndNoTopmost;
+                            SetWindowPos(handle, insertAfter, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpNoActivate);
+                        });
+                    }
+                    catch
+                    {
+                        // ignore transient dispatcher failures
+                    }
+
+                    await Task.Delay(500);
+                }
+            });
+        }
+
+        private static void MaintainMainWindowTopmost(Window? window, IntPtr handle)
+        {
+            MaintainMainWindowTopmost(window, handle, true, TimeSpan.FromSeconds(5));
+        }
+
+        private static void MaintainMainWindowTopmost(Window? window, IntPtr handle, TimeSpan duration)
+        {
+            MaintainMainWindowTopmost(window, handle, true, duration);
         }
 
         private static void BringToFront(string executablePath, Process? process)
@@ -241,6 +285,7 @@ namespace PublicPCControl.Client.ViewModels
 
                 if (handle != IntPtr.Zero)
                 {
+                    SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
                     ActivateHandle(handle);
                 }
             }
@@ -248,8 +293,6 @@ namespace PublicPCControl.Client.ViewModels
             {
                 // ignored
             }
-
-            return IntPtr.Zero;
         }
 
         private static IntPtr WaitForMainWindow(Process? process)
@@ -280,997 +323,7 @@ namespace PublicPCControl.Client.ViewModels
                     // ignored
                 }
 
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindExistingWindow(string executablePath)
-        {
-            if (string.IsNullOrWhiteSpace(executablePath))
-            {
-                return IntPtr.Zero;
-            }
-
-            var processName = Path.GetFileNameWithoutExtension(executablePath);
-            foreach (var proc in Process.GetProcessesByName(processName))
-            {
-                try
-                {
-                    var path = proc.MainModule?.FileName;
-                    if (!string.Equals(path, executablePath, StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
-                    }
-
-                    proc.Refresh();
-                    if (proc.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return proc.MainWindowHandle;
-                    }
-
-                    var fallback = FindVisibleWindowHandle(proc.Id);
-                    if (fallback != IntPtr.Zero)
-                    {
-                        return fallback;
-                    }
-                }
-                catch
-                {
-                    // ignore processes we cannot inspect
-                }
-            }
-
-            return IntPtr.Zero;
-        }
-
-        private static IntPtr FindVisibleWindowHandle(int processId)
-        {
-            IntPtr found = IntPtr.Zero;
-            EnumWindows((hWnd, _) =>
-            {
-                GetWindowThreadProcessId(hWnd, out var pid);
-                if (pid != processId || !IsWindowVisible(hWnd))
-                {
-                    return true;
-                }
-
-                found = hWnd;
-                return false;
-            }, IntPtr.Zero);
-
-            return found;
-        }
-
-        private static void ActivateHandle(IntPtr handle)
-        {
-            ShowWindow(handle, SwRestore);
-            SetWindowPos(handle, HwndTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetWindowPos(handle, HwndNoTopmost, 0, 0, 0, 0, SwpNoMove | SwpNoSize | SwpShowWindow);
-            SetForegroundWindow(handle);
-        }
-
-        private static IntPtr WaitForMainWindow(Process? process)
-        {
-            if (process == null)
-            {
-                return IntPtr.Zero;
-            }
-
-            for (var i = 0; i < 5; i++)
-            {
-                try
-                {
-                    if (process.HasExited)
-                    {
-                        break;
-                    }
-
-                    process.WaitForInputIdle(1000);
-                    process.Refresh();
-                    if (process.MainWindowHandle != IntPtr.Zero)
-                    {
-                        return process.MainWindowHandle;
-                    }
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                System.Threading.Thread.Sleep(150);
+                Thread.Sleep(150);
             }
 
             return IntPtr.Zero;
@@ -1367,5 +420,6 @@ namespace PublicPCControl.Client.ViewModels
         private const uint SwpNoMove = 0x0002;
         private const uint SwpNoSize = 0x0001;
         private const uint SwpShowWindow = 0x0040;
+        private const uint SwpNoActivate = 0x0010;
     }
 }
