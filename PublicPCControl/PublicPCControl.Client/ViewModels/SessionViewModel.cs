@@ -264,6 +264,11 @@ namespace PublicPCControl.Client.ViewModels
             });
         }
 
+        private static void MaintainMainWindowTopmost(Window? window, IntPtr handle, TimeSpan duration)
+        {
+            MaintainMainWindowTopmost(window, handle, true, duration);
+        }
+
         private static void BringToFront(string executablePath, Process? process)
         {
             try
