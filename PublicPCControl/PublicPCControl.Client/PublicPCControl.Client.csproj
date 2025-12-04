@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
@@ -7,7 +7,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>x86;x64</Platforms>
     <EnableWindowsTargeting>true</EnableWindowsTargeting>
-    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <RootNamespace>PublicPCControl.Client</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
