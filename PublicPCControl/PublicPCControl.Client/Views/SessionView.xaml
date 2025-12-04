@@ -64,14 +64,14 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Border Background="#10192a" Padding="18" CornerRadius="16" BorderBrush="#1f2c44" BorderThickness="1">
+        <Border Background="#10192a" Padding="12" CornerRadius="16" BorderBrush="#1f2c44" BorderThickness="1">
             <Border.Effect>
                 <DropShadowEffect BlurRadius="18" Color="#22000000" ShadowDepth="0" />
             </Border.Effect>
             <UniformGrid Columns="5" Rows="1" Margin="0" HorizontalAlignment="Stretch">
                 <StackPanel>
                     <TextBlock Text="사용자" Foreground="#92a9d8" />
-                    <TextBlock Text="{Binding CurrentSession.UserName}" FontSize="19" FontWeight="Bold" Foreground="#f6fbff" />
+                    <TextBlock Text="{Binding CurrentSession.UserName}" FontSize="17" FontWeight="Bold" Foreground="#f6fbff" />
                 </StackPanel>
                 <StackPanel>
                     <TextBlock Text="ID" Foreground="#92a9d8" />
@@ -79,19 +79,19 @@
                 </StackPanel>
                 <StackPanel>
                     <TextBlock Text="이용 목적" Foreground="#92a9d8" />
-                    <TextBlock Text="{Binding CurrentSession.Purpose}" Foreground="#f6fbff" />
+                    <TextBlock Text="{Binding CurrentSession.Purpose}" Foreground="#f6fbff" FontSize="14" />
                 </StackPanel>
                 <StackPanel>
                     <TextBlock Text="시작 시간" Foreground="#92a9d8" />
-                    <TextBlock Text="{Binding CurrentSession.StartTime, StringFormat=yyyy-MM-dd HH:mm}" Foreground="#f6fbff" />
+                    <TextBlock Text="{Binding CurrentSession.StartTime, StringFormat=yyyy-MM-dd HH:mm}" Foreground="#f6fbff" FontSize="14" />
                 </StackPanel>
                 <StackPanel>
                     <TextBlock Text="남은 시간" Foreground="#92a9d8" />
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                        <TextBlock Text="{Binding Remaining}" Foreground="#6dd69b" FontSize="22" FontWeight="Bold" />
-                        <TextBlock Text="5분 전 알림" Foreground="#f4c066" Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVis}}" Margin="10,4,0,0" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,0,2">
+                        <TextBlock Text="{Binding Remaining}" Foreground="#6dd69b" FontSize="20" FontWeight="Bold" />
+                        <TextBlock Text="5분 전 알림" Foreground="#f4c066" Visibility="{Binding ShowWarning, Converter={StaticResource BoolToVis}}" Margin="8,2,0,0" FontSize="12" />
                     </StackPanel>
-                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0" VerticalAlignment="Center">
                         <TextBlock Text="연장 가능" Foreground="#9fd6ff" />
                         <TextBlock Text="{Binding ExtensionsRemaining}" Foreground="#eaf2ff" FontWeight="Bold" Margin="6,0,0,0" />
                         <Button Content="연장" Command="{Binding ExtendCommand}" Padding="10,6" Background="#3a547d" Foreground="#eaf2ff" BorderBrush="#4f6fb5" BorderThickness="1" Margin="8,0,0,0" />

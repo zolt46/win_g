@@ -12,7 +12,7 @@ namespace PublicPCControl.Client.Models
         public int MaxExtensionCount { get; set; } = 2;
         public bool AllowExtensions { get; set; } = true;
         public bool KillDisallowedProcess { get; set; } = true;
-        public List<AllowedProgram> AllowedPrograms { get; set; } = new();
+        public List<AllowedProgram> AllowedPrograms { get; set; } = new List<AllowedProgram>();
         public string AdminPasswordHash { get; set; } = string.Empty;
     }
 }

@@ -11,7 +11,7 @@ namespace PublicPCControl.Client.Services
     public class ConfigService
     {
         private readonly string _configPath;
-        private readonly JsonSerializerOptions _options = new() { WriteIndented = true };
+        private readonly JsonSerializerOptions _options = new JsonSerializerOptions { WriteIndented = true };
 
         public ConfigService()
         {
