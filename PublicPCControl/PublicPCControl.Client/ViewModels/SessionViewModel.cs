@@ -203,6 +203,7 @@ namespace PublicPCControl.Client.ViewModels
                 };
 
                 BringToFront(program.ExecutablePath, process);
+                MaintainMainWindowTopmost(mainWindow, mainHandle);
                 _loggingService.LogProcessStart(CurrentSession.Id, program.DisplayName, program.ExecutablePath);
             }
             catch (Exception ex)
